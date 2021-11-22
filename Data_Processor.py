@@ -31,6 +31,11 @@ class Data_Processor(object):
             with open(path, 'r') as fp:
                 data = json.load(fp)
             print(len(data))
+            for paper_id, info in data.items():
+                for key, value in info.items():
+                    print(key)
+                    break
+                break
 
 
 if __name__ == '__main__':
