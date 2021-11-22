@@ -23,7 +23,8 @@ class Data_Processor(object):
     def __init__(self):
         print('Init...')
         self.data_root = './Datasets/'
-        self.aapr_root = self.data_root + 'AAPR_Dataset/'
+        self.original_root = self.data_root + 'original/'
+        self.aapr_root = self.original_root + 'AAPR_Dataset/'
 
     def show_json_data(self):
         for i in range(4):
@@ -36,6 +37,32 @@ class Data_Processor(object):
                     print(key)
                 break
 
+    def extract_abs_label(self):
+        abs_list = []
+        label_list = []
+        count = 0
+        error_count = 0
+        for i in range(4):
+            path = self.aapr_root + 'data{}'.format(i+1)
+            with open(path, 'r') as fp:
+                data = json.load(fp)
+                for paper_id, info in data.items():
+                    abs = info['abstract']
+                    label = info['category']
+                    if abs and label:
+                        abs_list.append(abs)
+                        label_list.append(label)
+                    else:
+                        print("Error abs: {}".format(abs))
+                        print("Error label: {}".format(label))
+                        error_count += 1
+                    count += 1
+
+        print(abs_list[0])
+        print(label_list[0])
+
+        print("There are {} papers.".format(count))
+        print("There are {} error abs or labels.".format(error_count))
 
 
 if __name__ == '__main__':
@@ -50,6 +77,8 @@ if __name__ == '__main__':
         print('This is a test process.')
     elif args.phase == 'show_json_data':
         data_processor.show_json_data()
+    elif args.phase == 'extract_abs_label':
+        data_processor.extract_abs_label()
     else:
         print("What the F**K! There is no {} function.".format(args.phase))
     end_time = datetime.datetime.now()
