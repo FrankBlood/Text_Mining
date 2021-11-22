@@ -34,8 +34,8 @@ class Data_Processor(object):
             for paper_id, info in data.items():
                 for key, value in info.items():
                     print(key)
-                    break
                 break
+
 
 
 if __name__ == '__main__':
