@@ -23,7 +23,7 @@ class Data_Processor(object):
     def __init__(self):
         print('Init...')
         self.data_root = './Datasets/'
-        self.aapr_root = self.data_root + 'AAPR_Dataset'
+        self.aapr_root = self.data_root + 'AAPR_Dataset/'
 
     def show_json_data(self):
         for i in range(4):
