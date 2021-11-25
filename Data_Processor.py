@@ -74,9 +74,9 @@ class Data_Processor(object):
                             venue_dict[venue] += 1
 
                         if venue in {'CoRR', 'No'}:
-                            label_list.append('Rejected')
+                            label_list.append('0')
                         else:
-                            label_list.append('Accepted')
+                            label_list.append('1')
 
                     else:
                         print("Error abs: {}".format(abs))
@@ -108,11 +108,14 @@ class Data_Processor(object):
     def save_pair(self, data_input, data_output, input_path, output_path):
         fw_input = open(input_path, 'w')
         fw_output = open(output_path, 'w')
+        count = 0
         for input, output in zip(data_input, data_output):
             fw_input.write(input + '\n')
             fw_output.write(output + '\n')
+            count += 1
         fw_input.close()
         fw_output.close()
+        print("There are {} lines.".format(count))
         print("Done for saving input to {}.".format(input_path))
         print("Done for saving output to {}.".format(output_path))
 
