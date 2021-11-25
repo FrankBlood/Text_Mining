@@ -105,19 +105,17 @@ class Data_Processor(object):
         print("There are {} error abs or labels.".format(error_count))
         return abs_list, label_list
 
-    def save_pair(self, data_input, data_output, input_path, output_path):
-        fw_input = open(input_path, 'w')
-        fw_output = open(output_path, 'w')
+    def save_single(self, data, path):
         count = 0
-        for input, output in zip(data_input, data_output):
-            fw_input.write(input + '\n')
-            fw_output.write(output + '\n')
-            count += 1
-        fw_input.close()
-        fw_output.close()
-        print("There are {} lines.".format(count))
-        print("Done for saving input to {}.".format(input_path))
-        print("Done for saving output to {}.".format(output_path))
+        with open(path, 'w') as fw:
+            for line in data:
+                fw.write(line + '\n')
+                count += 1
+        print("Done for saving {} lines to {}.".format(count, path))
+
+    def save_pair(self, data_input, data_output, input_path, output_path):
+        self.save_single(data_input, input_path)
+        self.save_single(data_output, output_path)
 
     def save_abs_label(self):
         save_path = self.data_root + 'aapr/'
@@ -156,16 +154,19 @@ class Data_Processor(object):
             train_output_path = self.data_root + '{}/train_{}.output'.format(data_name, i)
             self.save_pair(data_input=train_input, data_output=train_output,
                            input_path=train_input_path, output_path=train_output_path)
+            print("There are {} 1 labels.".format(sum(list(map(int, train_output)))/len(train_output)))
 
             val_input_path = self.data_root + '{}/val_{}.input'.format(data_name, i)
             val_output_path = self.data_root + '{}/val_{}.output'.format(data_name, i)
             self.save_pair(data_input=val_input, data_output=val_output,
                            input_path=val_input_path, output_path=val_output_path)
+            print("There are {} 1 labels.".format(sum(list(map(int, val_output))) / len(val_output)))
 
             test_input_path = self.data_root + '{}/test_{}.input'.format(data_name, i)
             test_output_path = self.data_root + '{}/test_{}.output'.format(data_name, i)
             self.save_pair(data_input=test_input, data_output=test_output,
                            input_path=test_input_path, output_path=test_output_path)
+            print("There are {} 1 labels.".format(sum(list(map(int, test_output))) / len(test_output)))
 
 
 if __name__ == '__main__':
