@@ -18,6 +18,7 @@ import argparse
 import datetime
 
 import json
+import random
 
 class Data_Processor(object):
     def __init__(self):
@@ -104,18 +105,64 @@ class Data_Processor(object):
         print("There are {} error abs or labels.".format(error_count))
         return abs_list, label_list
 
+    def save_pair(self, data_input, data_output, input_path, output_path):
+        fw_input = open(input_path, 'w')
+        fw_output = open(output_path, 'w')
+        for input, output in zip(data_input, data_output):
+            fw_input.write(input + '\n')
+            fw_output.write(output + '\n')
+        fw_input.close()
+        fw_output.close()
+        print("Done for saving input to {}.".format(input_path))
+        print("Done for saving output to {}.".format(output_path))
+
     def save_abs_label(self):
         save_path = self.data_root + 'aapr/'
         if not os.path.exists(save_path):
             os.mkdir(save_path)
         abs_list, label_list = self.extract_abs_label()
-        fw_input = open(save_path + 'data.input', 'w')
-        fw_output = open(save_path + 'data.output', 'w')
-        for abs, label in zip(abs_list, label_list):
-            fw_input.write(abs.strip() + '\n')
-            fw_output.write(label.strip() + '\n')
-        fw_input.close()
-        fw_output.close()
+        input_path = save_path + 'data.input'
+        output_path = save_path + 'data.output'
+        self.save_pair(data_input=abs_list, data_output=label_list, input_path=input_path, output_path=output_path)
+
+    def split_data(self, data_name='aapr', fold=10, rate=0.7):
+        with open(self.data_root + '{}/data.input'.format(data_name), 'r') as fp:
+            data_input = list(map(str, fp.readlines()))
+            print("Successfully load input data from {}.".format(self.data_root + '{}/data.input'.format(data_name)))
+
+        with open(self.data_root + '{}/data.output'.format(data_name), 'r') as fp:
+            data_output = list(map(str, fp.readlines()))
+            print("Successfully load output data from {}.".format(self.data_root + '{}/data.output'.format(data_name)))
+
+        for i in range(fold):
+            print("Processing fold {}...".format(i))
+            random.seed(i)
+            data = list(zip(data_input, data_output))
+            random.shuffle(data)
+            data_input, data_output = zip(*data)
+
+            data_size = len(data_output)
+            train_input = data_input[:int(data_size*rate)]
+            train_output = data_output[:int(data_size*rate)]
+            val_input = data_input[int(data_size*rate): int(data_size * (rate + (1-rate)/2))]
+            val_output = data_output[int(data_size*rate): int(data_size * (rate + (1-rate)/2))]
+            test_input = data_input[int(data_size * (rate + (1-rate)/2)):]
+            test_output = data_output[int(data_size * (rate + (1-rate)/2)):]
+
+            train_input_path = self.data_root + '{}/train.input'.format(data_name)
+            train_output_path = self.data_root + '{}/train.output'.format(data_name)
+            self.save_pair(data_input=train_input, data_output=train_output,
+                           input_path=train_input_path, output_path=train_output_path)
+
+            val_input_path = self.data_root + '{}/val.input'.format(data_name)
+            val_output_path = self.data_root + '{}/val.output'.format(data_name)
+            self.save_pair(data_input=val_input, data_output=val_output,
+                           input_path=val_input_path, output_path=val_output_path)
+
+            test_input_path = self.data_root + '{}/test.input'.format(data_name)
+            test_output_path = self.data_root + '{}/test.output'.format(data_name)
+            self.save_pair(data_input=test_input, data_output=test_output,
+                           input_path=test_input_path, output_path=test_output_path)
 
 
 if __name__ == '__main__':
