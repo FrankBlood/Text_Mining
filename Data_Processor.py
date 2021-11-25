@@ -127,11 +127,11 @@ class Data_Processor(object):
 
     def split_data(self, data_name='aapr', fold=10, rate=0.7):
         with open(self.data_root + '{}/data.input'.format(data_name), 'r') as fp:
-            data_input = list(map(str, fp.readlines()))
+            data_input = list(map(lambda x: x.strip(), fp.readlines()))
             print("Successfully load input data from {}.".format(self.data_root + '{}/data.input'.format(data_name)))
 
         with open(self.data_root + '{}/data.output'.format(data_name), 'r') as fp:
-            data_output = list(map(str, fp.readlines()))
+            data_output = list(map(lambda x: x.strip(), fp.readlines()))
             print("Successfully load output data from {}.".format(self.data_root + '{}/data.output'.format(data_name)))
 
         for i in range(fold):
@@ -181,6 +181,8 @@ if __name__ == '__main__':
         data_processor.extract_abs_label()
     elif args.phase == 'save_abs_label':
         data_processor.save_abs_label()
+    elif args.phase == 'split_data':
+        data_processor.split_data()
     else:
         print("What the F**K! There is no {} function.".format(args.phase))
     end_time = datetime.datetime.now()
