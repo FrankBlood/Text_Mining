@@ -39,7 +39,8 @@ class Data_Processor(object):
 
     def extract_abs_label(self):
         abs_list = []
-        label_list = []
+        category_list = []
+        venue_list = []
         count = 0
         error_count = 0
         for i in range(4):
@@ -48,18 +49,31 @@ class Data_Processor(object):
                 data = json.load(fp)
                 for paper_id, info in data.items():
                     abs = info['abstract']
-                    label = info['category']
-                    if abs and label:
+                    category = info['category']
+                    venue = info['venue']
+                    if abs and category and venue:
                         abs_list.append(abs)
-                        label_list.append(label)
+                        category_list.append(category)
+                        venue_list.append(venue)
                     else:
                         print("Error abs: {}".format(abs))
-                        print("Error label: {}".format(label))
+                        print("Error label: {}".format(category))
+                        print("Error venue: {}".format(venue))
                         error_count += 1
                     count += 1
 
-        print(abs_list[0])
-        print(label_list[0])
+        top_num = 5
+        print("Print top {} abs:".format(top_num))
+        for abs in abs_list[:top_num]:
+            print(abs)
+
+        print("Print top {} category:".format(top_num))
+        for category in category_list[:top_num]:
+            print(category)
+
+        print("Print top {} venue:".format(top_num))
+        for venue in venue_list[:top_num]:
+            print(venue)
 
         print("There are {} papers.".format(count))
         print("There are {} error abs or labels.".format(error_count))
