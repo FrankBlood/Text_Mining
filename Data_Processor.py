@@ -55,9 +55,9 @@ class Data_Processor(object):
             with open(path, 'r') as fp:
                 data = json.load(fp)
                 for paper_id, info in data.items():
-                    abs = info['abstract']
-                    category = info['category']
-                    venue = info['venue']
+                    abs = info['abstract'].strip()
+                    category = info['category'].strip()
+                    venue = info['venue'].strip()
                     if abs and category and venue:
                         abs_list.append(abs)
                         category_list.append(category)
@@ -130,6 +130,8 @@ if __name__ == '__main__':
         data_processor.show_json_data()
     elif args.phase == 'extract_abs_label':
         data_processor.extract_abs_label()
+    elif args.phase == 'save_abs_label':
+        data_processor.save_abs_label()
     else:
         print("What the F**K! There is no {} function.".format(args.phase))
     end_time = datetime.datetime.now()
