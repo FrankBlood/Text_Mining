@@ -26,6 +26,9 @@ class Data_Processor(object):
         self.original_root = self.data_root + 'original/'
         self.aapr_root = self.original_root + 'AAPR_Dataset/'
 
+    ##############################
+    # AAPR
+    ##############################
     def show_json_data(self):
         for i in range(4):
             path = self.aapr_root + 'data{}'.format(i+1)
@@ -40,7 +43,11 @@ class Data_Processor(object):
     def extract_abs_label(self):
         abs_list = []
         category_list = []
+        category_dict = {}
         venue_list = []
+        venue_dict = {}
+        label_list = []
+
         count = 0
         error_count = 0
         for i in range(4):
@@ -54,7 +61,22 @@ class Data_Processor(object):
                     if abs and category and venue:
                         abs_list.append(abs)
                         category_list.append(category)
+                        if category not in category_dict:
+                            category_dict[category] = 1
+                        else:
+                            category_dict[category] += 1
+
                         venue_list.append(venue)
+                        if venue not in venue_dict:
+                            venue_dict[venue] = 1
+                        else:
+                            venue_dict[venue] += 1
+
+                        if venue in {'CoRR', 'No'}:
+                            label_list.append('Rejected')
+                        else:
+                            label_list.append('Accepted')
+
                     else:
                         print("Error abs: {}".format(abs))
                         print("Error label: {}".format(category))
@@ -75,8 +97,23 @@ class Data_Processor(object):
         for venue in venue_list[:top_num]:
             print(venue)
 
+        print("category_dict:\n", category_dict)
+        print("venue_dict:\n", venue_dict)
+
         print("There are {} papers.".format(count))
         print("There are {} error abs or labels.".format(error_count))
+        return abs_list, label_list
+
+    def save_abs_label(self):
+        save_path = self.data_root + 'aapr/'
+        abs_list, label_list = self.extract_abs_label()
+        fw_input = open(save_path + 'data.input', 'w')
+        fw_output = open(save_path + 'data.output', 'w')
+        for abs, label in zip(abs_list, label_list):
+            fw_input.write(abs.strip() + '\n')
+            fw_output.write(label.strip() + '\n')
+        fw_input.close()
+        fw_output.close()
 
 
 if __name__ == '__main__':
