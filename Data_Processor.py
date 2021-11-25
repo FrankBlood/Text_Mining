@@ -125,6 +125,7 @@ class Data_Processor(object):
         input_path = save_path + 'data.input'
         output_path = save_path + 'data.output'
         self.save_pair(data_input=abs_list, data_output=label_list, input_path=input_path, output_path=output_path)
+        print("There are {} 1 labels.".format(sum(list(map(int, label_list)))/len(label_list)))
 
     def split_data(self, data_name='aapr', fold=10, rate=0.7):
         with open(self.data_root + '{}/data.input'.format(data_name), 'r') as fp:
