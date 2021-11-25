@@ -106,6 +106,8 @@ class Data_Processor(object):
 
     def save_abs_label(self):
         save_path = self.data_root + 'aapr/'
+        if not os.path.exists(save_path):
+            os.mkdir(save_path)
         abs_list, label_list = self.extract_abs_label()
         fw_input = open(save_path + 'data.input', 'w')
         fw_output = open(save_path + 'data.output', 'w')
