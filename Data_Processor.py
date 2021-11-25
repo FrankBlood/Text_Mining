@@ -149,18 +149,18 @@ class Data_Processor(object):
             test_input = data_input[int(data_size * (rate + (1-rate)/2)):]
             test_output = data_output[int(data_size * (rate + (1-rate)/2)):]
 
-            train_input_path = self.data_root + '{}/train.input'.format(data_name)
-            train_output_path = self.data_root + '{}/train.output'.format(data_name)
+            train_input_path = self.data_root + '{}/train_{}.input'.format(data_name, i)
+            train_output_path = self.data_root + '{}/train_{}.output'.format(data_name, i)
             self.save_pair(data_input=train_input, data_output=train_output,
                            input_path=train_input_path, output_path=train_output_path)
 
-            val_input_path = self.data_root + '{}/val.input'.format(data_name)
-            val_output_path = self.data_root + '{}/val.output'.format(data_name)
+            val_input_path = self.data_root + '{}/val_{}.input'.format(data_name, i)
+            val_output_path = self.data_root + '{}/val_{}.output'.format(data_name, i)
             self.save_pair(data_input=val_input, data_output=val_output,
                            input_path=val_input_path, output_path=val_output_path)
 
-            test_input_path = self.data_root + '{}/test.input'.format(data_name)
-            test_output_path = self.data_root + '{}/test.output'.format(data_name)
+            test_input_path = self.data_root + '{}/test_{}.input'.format(data_name, i)
+            test_output_path = self.data_root + '{}/test_{}.output'.format(data_name, i)
             self.save_pair(data_input=test_input, data_output=test_output,
                            input_path=test_input_path, output_path=test_output_path)
 
