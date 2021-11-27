@@ -136,7 +136,7 @@ class Data_Processor(object):
         new_line = nltk.word_tokenize(line.lower())
         return ' '.join(new_line)
 
-    def split_data(self, data_name='aapr', fold=10, rate=0.7, clean=0):
+    def split_data(self, data_name='aapr', fold=10, split_rate=0.7, clean=0, *args, **kwargs):
         with open(self.data_root + '{}/data.input'.format(data_name), 'r') as fp:
             data_input = list(map(lambda x: x.strip(), fp.readlines()))
             print("Successfully load input data from {}.".format(self.data_root + '{}/data.input'.format(data_name)))
@@ -153,12 +153,12 @@ class Data_Processor(object):
             data_input, data_output = zip(*data)
 
             data_size = len(data_output)
-            train_input = data_input[:int(data_size*rate)]
-            train_output = data_output[:int(data_size*rate)]
-            val_input = data_input[int(data_size*rate): int(data_size * (rate + (1-rate)/2))]
-            val_output = data_output[int(data_size*rate): int(data_size * (rate + (1-rate)/2))]
-            test_input = data_input[int(data_size * (rate + (1-rate)/2)):]
-            test_output = data_output[int(data_size * (rate + (1-rate)/2)):]
+            train_input = data_input[:int(data_size*split_rate)]
+            train_output = data_output[:int(data_size*split_rate)]
+            val_input = data_input[int(data_size*split_rate): int(data_size * (split_rate + (1-split_rate)/2))]
+            val_output = data_output[int(data_size*split_rate): int(data_size * (split_rate + (1-split_rate)/2))]
+            test_input = data_input[int(data_size * (split_rate + (1-split_rate)/2)):]
+            test_output = data_output[int(data_size * (split_rate + (1-split_rate)/2)):]
 
             if clean:
                 mode = '_'.join(['clean'])
@@ -180,8 +180,7 @@ class Data_Processor(object):
                 val_input_path = self.data_root + '{}/val_{}.input'.format(data_name, i)
                 val_output_path = self.data_root + '{}/val_{}.output'.format(data_name, i)
             self.save_pair(data_input=val_input, data_output=val_output,
-                           input_path=val_input_path, output_path=val_output_path,
-                           clean=clean)
+                           input_path=val_input_path, output_path=val_output_path, clean=clean)
             print("There are {} 1 labels.".format(sum(list(map(int, val_output))) / len(val_output)))
 
             if clean:
@@ -192,8 +191,7 @@ class Data_Processor(object):
                 test_input_path = self.data_root + '{}/test_{}.input'.format(data_name, i)
                 test_output_path = self.data_root + '{}/test_{}.output'.format(data_name, i)
             self.save_pair(data_input=test_input, data_output=test_output,
-                           input_path=test_input_path, output_path=test_output_path,
-                           clean=clean)
+                           input_path=test_input_path, output_path=test_output_path, clean=clean)
             print("There are {} 1 labels.".format(sum(list(map(int, test_output))) / len(test_output)))
 
     def clean_data(self, data_name='aapr', phase='train', fold=0, clean=1, clear=0, *args, **kwargs):
@@ -234,7 +232,14 @@ if __name__ == '__main__':
     elif args.phase == 'save_abs_label':
         data_processor.save_abs_label()
     elif args.phase.split('+')[0] == 'split_data':
-        data_processor.split_data(clean=int(args.phase.split('+')[1]))
+        config_name = args.phase.split('+')[1]
+        config_path = './config/{}'.format(config_name)
+        config = json.load(open(config_path, 'r'))
+        data_name = config['data_name']
+        fold = config['fold']
+        split_rate = config['split_rate']
+        clean = config['clean']
+        data_processor.split_data(data_name=data_name, fold=fold, split_rate=split_rate, clean=clean, **config)
     else:
         print("What the F**K! There is no {} function.".format(args.phase))
     end_time = datetime.datetime.now()

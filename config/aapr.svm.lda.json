@@ -5,5 +5,7 @@
   "feature": "lda",
   "clear": 1,
   "clean": 0,
-  "metrics_num": 4
+  "metrics_num": 4,
+  "num_topics": 20,
+  "split_rate": 0.7
 }

@@ -59,7 +59,10 @@ class Data_Loader(Data_Processor):
                     dump(dictionary, dictionary_save_path)
                     print("Successfully save dict to {}.".format(dictionary_save_path))
                 corpus = [dictionary.doc2bow(text.strip().split()) for text in input_data]
-                feature_extractor = LdaModel(corpus, num_topics=20)
+                num_topics = 20
+                if 'num_topics' in kwargs:
+                    num_topics = kwargs['num_topics']
+                feature_extractor = LdaModel(corpus, num_topics=num_topics)
 
             else:
                 raise RuntimeError("Please confirm which feature you need.")

@@ -42,7 +42,7 @@ def main_ml(config):
     for fold in range(folds):
         x_train, y_train = data_loader.data_load(data_name=data_name, phase='train',
                                                  fold=fold, feature=feature,
-                                                 clean=clean, clear=clear)
+                                                 clean=clean, clear=clear, **config)
         model = ml_model_dict[model_name](metrics_num=metrics_num)
         model.build()
 
