@@ -38,7 +38,7 @@ class Data_Loader(Data_Processor):
         save_folder = self.exp_root + data_name
         if not os.path.exists(save_folder):
             os.mkdir(save_folder)
-        save_path = save_folder + '/ml_feature.{}'.format(feature)
+        save_path = save_folder + '/ml_feature.{}.{}'.format(feature, fold)
 
         if phase == 'train':
             if feature == 'tf':
@@ -50,7 +50,7 @@ class Data_Loader(Data_Processor):
         else:
             feature_extractor = load(save_path)
 
-        if not os.path.exists(self.exp_root + '{}/ml_feature.{}'.format(data_name, feature)):
+        if not os.path.exists(self.exp_root + '{}/ml_feature.{}.{}'.format(data_name, feature, fold)):
             dump(feature_extractor, save_path)
 
         x = feature_extractor.transform(input_data)
