@@ -21,10 +21,10 @@ from utils.metrics import cal_all
 
 
 class Base_Model(object):
-    def __init__(self):
+    def __init__(self, metrics_num=4):
         print('Init...')
         self.model_name = 'ml'
-        self.metrics_num = 4
+        self.metrics_num = metrics_num
 
     def build(self):
         self.model = None
@@ -56,8 +56,8 @@ class Base_Model(object):
             metric = cal_all
         cal_res = metric(y, pred_y)
         sorted_cal_res = sorted(cal_res, key=lambda x: x[0])
-        metric_names = '\t'.join([name_score(0)[1:] for name_score in sorted_cal_res])
-        metric_score = '\t'.join(['{:.2f}'.format(name_score(1)) for name_score in sorted_cal_res])
+        metric_names = '\t'.join([name_score[0][1:] for name_score in sorted_cal_res])
+        metric_score = '\t'.join(['{:.2f}'.format(name_score[1]) for name_score in sorted_cal_res])
         if phase == 'train':
             print("{}\t{}\t{}".format(self.model_name, phase, metric_names))
         print("{}\t{}\t".format(self.model_name, phase, metric_score))

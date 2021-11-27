@@ -41,7 +41,7 @@ def main_ml(config):
     for fold in range(folds):
         x_train, y_train = data_loader.data_load(data_name=data_name, phase='train',
                                                  fold=fold, feature=feature, clear=clear)
-        model = ml_model_dict[model_name]()
+        model = ml_model_dict[model_name](metrics_num=metrics_num)
         model.build()
 
         model.train(x_train, y_train)
@@ -55,12 +55,13 @@ def main_ml(config):
 
         model.evaluate(x_val, y_val, phase='val')
         sorted_cal_res = model.evaluate(x_test, y_test, phase='test')
+
         name_list = [name_score[0][1:] for name_score in sorted_cal_res]
-        fold_score_list = np.array([name_score[1] for name_score in sorted_cal_res])
+        fold_score_list = [name_score[1] for name_score in sorted_cal_res]
         score_list.append(fold_score_list)
     score_mean = np.mean(score_list, axis=0)
     score_std = np.std(score_list, axis=0)
-    mean_std_list = ['{:.2f}+_{}'.format(mean, std) for mean, std in zip(score_mean, score_std)]
+    mean_std_list = ['{:.2f}+_{:.2f}'.format(mean, std) for mean, std in zip(score_mean, score_std)]
     print("\t".format(name_list))
     print("\t".format(mean_std_list))
 
