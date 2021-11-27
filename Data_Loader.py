@@ -71,11 +71,9 @@ class Data_Loader(Data_Processor):
 
         if feature == 'lda':
             dictionary = load(save_path+'.dict')
-            corpus = [dictionary.doc2bow(text.strip().split()) for text in input_data]
-            x = feature_extractor.get_document_topics(corpus)  # , minimum_probability=0
-            # x = feature_extractor[corpus]
+            x = [feature_extractor.get_document_topics(dictionary.doc2bow(text.strip().split()), minimum_probability=0)
+                 for text in input_data]
             x = [[prob for (topic, prob) in line] for line in x]
-            print(type(x))
         else:
             x = feature_extractor.transform(input_data)
             print(type(x))
