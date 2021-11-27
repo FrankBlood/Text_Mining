@@ -30,10 +30,11 @@ def main_ml(config):
     model_name = config['model_name']  # 'svm'
     folds = config['folds']  # 10
     feature = config['feature']  # 'tf'
+    clear = config['clear']
 
     data_loader = Data_Loader()
     for fold in range(folds):
-        x_train, y_train = data_loader.data_load(data_name=data_name, phase='train', fold=fold, feature=feature)
+        x_train, y_train = data_loader.data_load(data_name=data_name, phase='train', fold=fold, feature=feature, clear=clear)
         model = ml_model_dict[model_name]()
         model.build()
 

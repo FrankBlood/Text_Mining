@@ -27,7 +27,7 @@ class Data_Loader(Data_Processor):
     def __init__(self):
         super(Data_Loader, self).__init__()
 
-    def data_load(self, data_name='aapr', phase='train', fold=0, feature='tf'):
+    def data_load(self, data_name='aapr', phase='train', fold=0, feature='tf', clear=0):
         input_path = '{}{}/{}_{}.input'.format(self.data_root, data_name, phase, fold)
         output_path = '{}{}/{}_{}.output'.format(self.data_root, data_name, phase, fold)
         with open(input_path, 'r') as fp:
@@ -50,7 +50,7 @@ class Data_Loader(Data_Processor):
         else:
             feature_extractor = load(save_path)
 
-        if not os.path.exists(self.exp_root + '{}/ml_feature.{}.{}'.format(data_name, feature, fold)):
+        if not os.path.exists(self.exp_root + '{}/ml_feature.{}.{}'.format(data_name, feature, fold)) or clear:
             dump(feature_extractor, save_path)
 
         x = feature_extractor.transform(input_data)

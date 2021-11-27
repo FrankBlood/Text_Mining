@@ -2,5 +2,6 @@
   "data_name": "aapr",
   "model_name": "svm",
   "folds": 10,
-  "feature": "tf"
+  "feature": "tf",
+  "clear": 0
 }
