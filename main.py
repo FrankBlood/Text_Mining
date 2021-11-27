@@ -33,7 +33,6 @@ def main_ml(config):
 
     data_loader = Data_Loader()
     for fold in range(folds):
-
         x_train, y_train = data_loader.data_load(data_name=data_name, phase='train', fold=fold, feature=feature)
         model = ml_model_dict[model_name]()
         model.build()
@@ -45,10 +44,10 @@ def main_ml(config):
         model.evaluate(x_train, y_train, phase='train')
 
         x_val, y_val = data_loader.data_load(data_name=data_name, phase='val', fold=fold, feature=feature)
-        x_test, x_test = data_loader.data_load(data_name=data_name, phase='test', fold=fold, feature=feature)
+        x_test, y_test = data_loader.data_load(data_name=data_name, phase='test', fold=fold, feature=feature)
 
         model.evaluate(x_val, y_val, phase='val')
-        model.evaluate(x_test, x_test, phase='test')
+        model.evaluate(x_test, y_test, phase='test')
 
 
 if __name__ == '__main__':
@@ -57,17 +56,18 @@ if __name__ == '__main__':
     parser.add_argument('--phase', default='test', help='the function name.')
 
     args = parser.parse_args()
+    config_path = './config/{}.json'.format(args.phase)
+    if not os.path.exists(config_path):
+        raise RuntimeError("There is no {} config.".format(args.phase))
+    config = json.load(open(config_path, 'r'))
+    print(config)
 
-    if args.phase == 'test':
-        print('This is a test process.')
-    elif args.phase == 'aapr.svm.tf':
-        config = json.load(open('./config/{}.json'.format(args.phase), 'r'))
-        print("config: \n", config)
-        if config['model_name'] in ml_model_dict:
-            main_ml(config)
+    model_name = config['model_name']
+    if model_name in ml_model_dict:
+        main_ml(config)
     else:
-        print("What the F**K! There is no {} function.".format(args.phase))
+        raise RuntimeError("There is no model name.".format(model_name))
+
     end_time = datetime.datetime.now()
     print('{} takes {} seconds.'.format(args.phase, (end_time - start_time).seconds))
-
     print('Done main!')
