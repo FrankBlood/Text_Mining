@@ -30,7 +30,7 @@ class Data_Loader(Data_Processor):
     def __init__(self):
         super(Data_Loader, self).__init__()
 
-    def data_load(self, data_name='aapr', phase='train', fold=0, feature='tf', clean=1, clear=0, *args, **kwargs):
+    def data_load(self, data_name='aapr', phase='train', fold=0, feature='tf', clean=0, clear=0, *args, **kwargs):
         if clean:
             mode = '_'.join(['clean'])
             input_path = '{}{}/{}_{}_{}.input'.format(self.data_root, data_name, phase, mode, fold)
@@ -54,12 +54,13 @@ class Data_Loader(Data_Processor):
                 feature_extractor = TfidfTransformer().fit(input_data)
             elif feature == 'lda':
                 dictionary = Dictionary([text.strip().split() for text in input_data])
-                corpus = [dictionary.doc2bow(text.strip().split()) for text in input_data]
-                feature_extractor = LdaModel(corpus, num_topics=10)
                 dictionary_save_path = save_path + '.dict'
                 if not os.path.exists(dictionary_save_path) or clear:
-                    dump(dictionary, save_path)
+                    dump(dictionary, dictionary_save_path)
                     print("Successfully save dict to {}.".format(dictionary_save_path))
+                corpus = [dictionary.doc2bow(text.strip().split()) for text in input_data]
+                feature_extractor = LdaModel(corpus, num_topics=20)
+
             else:
                 raise RuntimeError("Please confirm which feature you need.")
             if not os.path.exists(save_path) or clear:
@@ -70,7 +71,7 @@ class Data_Loader(Data_Processor):
 
         if feature == 'lda':
             dictionary = load(save_path+'.dict')
-            corpus = [dictionary.doc2bow(text) for text in input_data]
+            corpus = [dictionary.doc2bow(text.strip().split()) for text in input_data]
             x = feature_extractor[corpus]
         else:
             x = feature_extractor.transform(input_data)
