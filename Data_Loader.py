@@ -47,7 +47,7 @@ class Data_Loader(Data_Processor):
             os.mkdir(save_folder)
         save_path = save_folder + '/ml_feature.{}.{}'.format(feature, fold)
 
-        if phase == 'train':
+        if phase == 'train' and (not os.path.exists(save_path) or clear):
             if feature == 'tf':
                 feature_extractor = CountVectorizer().fit(input_data)
             elif feature == 'tfidf':
