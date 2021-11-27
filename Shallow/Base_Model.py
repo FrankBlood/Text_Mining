@@ -24,6 +24,7 @@ class Base_Model(object):
     def __init__(self):
         print('Init...')
         self.model_name = 'ml'
+        self.metrics_num = 4
 
     def build(self):
         self.model = None
@@ -50,10 +51,17 @@ class Base_Model(object):
         if path:
             self.model = self.load_model(path)
         pred_y = self.model.predict(x)
-        acc, precision, recall, f1_score = cal_all(y, pred_y)
+        metric = cal_all
+        if self.metrics_num == 4:
+            metric = cal_all
+        cal_res = metric(y, pred_y)
+        sorted_cal_res = sorted(cal_res, key=lambda x: x[0])
+        metric_names = '\t'.join([name_score(0)[1:] for name_score in sorted_cal_res])
+        metric_score = '\t'.join(['{:.2f}'.format(name_score(1)) for name_score in sorted_cal_res])
         if phase == 'train':
-            print("{}\t{}\tacc\tprecision\trecall\tf1score".format(self.model_name, phase))
-        print("{}\t{}\t{}\t{}\t{}\t{:.4f}".format(self.model_name, phase, acc, precision, recall, f1_score))
+            print("{}\t{}\t{}".format(self.model_name, phase, metric_names))
+        print("{}\t{}\t".format(self.model_name, phase, metric_score))
+        return sorted_cal_res
 
 
 if __name__ == '__main__':

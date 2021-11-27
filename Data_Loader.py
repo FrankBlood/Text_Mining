@@ -27,7 +27,7 @@ class Data_Loader(Data_Processor):
     def __init__(self):
         super(Data_Loader, self).__init__()
 
-    def data_load(self, data_name='aapr', phase='train', fold=0, feature='tf', clear=0):
+    def data_load(self, data_name='aapr', phase='train', fold=0, feature='tf', clear=0, *args, **kwargs):
         input_path = '{}{}/{}_{}.input'.format(self.data_root, data_name, phase, fold)
         output_path = '{}{}/{}_{}.output'.format(self.data_root, data_name, phase, fold)
         with open(input_path, 'r') as fp:

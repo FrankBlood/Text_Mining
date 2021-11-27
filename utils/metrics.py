@@ -54,7 +54,7 @@ def cal_all(y_true, y_pred):
     precision = cal_precision(y_true, y_pred)
     recall = cal_recall(y_true, y_pred)
     f1score = cal_f1score(y_true, y_pred)
-    return acc, precision, recall, f1score
+    return {'1acc': acc*100, '2precision': precision*100, '3recall': recall*100, '4f1score': f1score*100}
 
 
 if __name__ == '__main__':
