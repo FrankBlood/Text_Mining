@@ -197,6 +197,22 @@ class Data_Processor(object):
                            input_path=test_input_path, output_path=test_output_path, clean=clean)
             print("There are {} 1 labels.".format(sum(list(map(int, test_output))) / len(test_output)))
 
+    # def get_vocab(self, data_name='aapr', fold=10):
+    #     for i in range(fold):
+    #         train_input_path = self.data_root + '{}/train_{}.input'.format(data_name, i)
+    #         with open(train_input_path, 'r') as fp:
+    #
+    #
+    #         data_input = list(map(lambda x: x.strip(), fp.readlines()))
+    #         print("Successfully load input data from {}.".format(self.data_root + '{}/data.input'.format(data_name)))
+    #
+    #     with open(self.data_root + '{}/data.output'.format(data_name), 'r') as fp:
+    #         data_output = list(map(lambda x: x.strip(), fp.readlines()))
+    #         print("Successfully load output data from {}.".format(self.data_root + '{}/data.output'.format(data_name)))
+
+
+
+
 
 if __name__ == '__main__':
     start_time = datetime.datetime.now()
