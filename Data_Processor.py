@@ -27,6 +27,8 @@ class Data_Processor(object):
         self.original_root = self.data_root + 'original/'
         self.aapr_root = self.original_root + 'AAPR_Dataset/'
 
+        self.exp_root = './exp/'
+
     ##############################
     # AAPR
     ##############################
