@@ -2,7 +2,7 @@
   "data_name": "aapr",
   "model_name": "svm",
   "folds": 10,
-  "feature": "tf",
+  "feature": "tfidf",
   "clear": 1,
   "clean": 0,
   "metrics_num": 4
