@@ -18,11 +18,21 @@ import argparse
 import datetime
 from Data_Loader import Data_Loader
 from Shallow.SVM import SVM
+from Shallow.AdaBoost import AdaBoost
+from Shallow.Gaussian_Naive_Bayes import Gaussian_Naive_Bayes
+from Shallow.GBDT import GBDT
+from Shallow.Logistic_Regression import Logistic_Regression
+from Shallow.Random_Forest import Random_Forest
 import json
 import numpy as np
 
 ml_model_dict = {
-    'svm': SVM
+    'svm': SVM,
+    'adaboost': AdaBoost,
+    'gnb': Gaussian_Naive_Bayes,
+    'gbdt': GBDT,
+    'lr': Logistic_Regression,
+    'rf': Random_Forest,
 }
 
 
