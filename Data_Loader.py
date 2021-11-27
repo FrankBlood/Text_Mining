@@ -47,11 +47,11 @@ class Data_Loader(Data_Processor):
                 feature_extractor = TfidfTransformer().fit(input_data)
             else:
                 raise RuntimeError("Please confirm which feature you need.")
+            if not os.path.exists(self.exp_root + '{}/ml_feature.{}.{}'.format(data_name, feature, fold)) or clear:
+                dump(feature_extractor, save_path)
+                print("Successfully save features to {}.".format(save_path))
         else:
             feature_extractor = load(save_path)
-
-        if not os.path.exists(self.exp_root + '{}/ml_feature.{}.{}'.format(data_name, feature, fold)) or clear:
-            dump(feature_extractor, save_path)
 
         x = feature_extractor.transform(input_data)
         y = output_data

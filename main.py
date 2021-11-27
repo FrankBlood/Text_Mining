@@ -34,7 +34,8 @@ def main_ml(config):
 
     data_loader = Data_Loader()
     for fold in range(folds):
-        x_train, y_train = data_loader.data_load(data_name=data_name, phase='train', fold=fold, feature=feature, clear=clear)
+        x_train, y_train = data_loader.data_load(data_name=data_name, phase='train',
+                                                 fold=fold, feature=feature, clear=clear)
         model = ml_model_dict[model_name]()
         model.build()
 
