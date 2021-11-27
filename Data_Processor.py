@@ -19,6 +19,7 @@ import datetime
 
 import json
 import random
+import nltk
 
 class Data_Processor(object):
     def __init__(self):
@@ -107,15 +108,17 @@ class Data_Processor(object):
         print("There are {} error abs or labels.".format(error_count))
         return abs_list, label_list
 
-    def save_single(self, data, path):
+    def save_single(self, data, path, clean=0):
         count = 0
         with open(path, 'w') as fw:
             for line in data:
+                if clean:
+                    line = self.clean_line(line)
                 fw.write(line + '\n')
                 count += 1
         print("Done for saving {} lines to {}.".format(count, path))
 
-    def save_pair(self, data_input, data_output, input_path, output_path):
+    def save_pair(self, data_input, data_output, input_path, output_path, clean=0):
         self.save_single(data_input, input_path)
         self.save_single(data_output, output_path)
 
@@ -129,7 +132,11 @@ class Data_Processor(object):
         self.save_pair(data_input=abs_list, data_output=label_list, input_path=input_path, output_path=output_path)
         print("There are {} 1 labels.".format(sum(list(map(int, label_list)))/len(label_list)))
 
-    def split_data(self, data_name='aapr', fold=10, rate=0.7):
+    def clean_line(self, line):
+        new_line = nltk.word_tokenize(line.lower())
+        return ' '.join(new_line)
+
+    def split_data(self, data_name='aapr', fold=10, rate=0.7, clean=0):
         with open(self.data_root + '{}/data.input'.format(data_name), 'r') as fp:
             data_input = list(map(lambda x: x.strip(), fp.readlines()))
             print("Successfully load input data from {}.".format(self.data_root + '{}/data.input'.format(data_name)))
@@ -153,23 +160,61 @@ class Data_Processor(object):
             test_input = data_input[int(data_size * (rate + (1-rate)/2)):]
             test_output = data_output[int(data_size * (rate + (1-rate)/2)):]
 
-            train_input_path = self.data_root + '{}/train_{}.input'.format(data_name, i)
-            train_output_path = self.data_root + '{}/train_{}.output'.format(data_name, i)
+            if clean:
+                mode = '_'.join(['clean'])
+                train_input_path = self.data_root + '{}/train_{}_{}.input'.format(data_name, mode, i)
+                train_output_path = self.data_root + '{}/train_{}_{}.output'.format(data_name, mode, i)
+            else:
+                train_input_path = self.data_root + '{}/train_{}.input'.format(data_name, i)
+                train_output_path = self.data_root + '{}/train_{}.output'.format(data_name, i)
             self.save_pair(data_input=train_input, data_output=train_output,
-                           input_path=train_input_path, output_path=train_output_path)
+                           input_path=train_input_path, output_path=train_output_path,
+                           clean=clean)
             print("There are {} 1 labels.".format(sum(list(map(int, train_output)))/len(train_output)))
 
-            val_input_path = self.data_root + '{}/val_{}.input'.format(data_name, i)
-            val_output_path = self.data_root + '{}/val_{}.output'.format(data_name, i)
+            if clean:
+                mode = '_'.join(['clean'])
+                val_input_path = self.data_root + '{}/val_{}_{}.input'.format(data_name, mode, i)
+                val_output_path = self.data_root + '{}/val_{}_{}.output'.format(data_name, mode, i)
+            else:
+                val_input_path = self.data_root + '{}/val_{}.input'.format(data_name, i)
+                val_output_path = self.data_root + '{}/val_{}.output'.format(data_name, i)
             self.save_pair(data_input=val_input, data_output=val_output,
-                           input_path=val_input_path, output_path=val_output_path)
+                           input_path=val_input_path, output_path=val_output_path,
+                           clean=clean)
             print("There are {} 1 labels.".format(sum(list(map(int, val_output))) / len(val_output)))
 
-            test_input_path = self.data_root + '{}/test_{}.input'.format(data_name, i)
-            test_output_path = self.data_root + '{}/test_{}.output'.format(data_name, i)
+            if clean:
+                mode = '_'.join(['clean'])
+                test_input_path = self.data_root + '{}/test_{}_{}.input'.format(data_name, mode, i)
+                test_output_path = self.data_root + '{}/test_{}_{}.output'.format(data_name, mode, i)
+            else:
+                test_input_path = self.data_root + '{}/test_{}.input'.format(data_name, i)
+                test_output_path = self.data_root + '{}/test_{}.output'.format(data_name, i)
             self.save_pair(data_input=test_input, data_output=test_output,
-                           input_path=test_input_path, output_path=test_output_path)
+                           input_path=test_input_path, output_path=test_output_path,
+                           clean=clean)
             print("There are {} 1 labels.".format(sum(list(map(int, test_output))) / len(test_output)))
+
+    def clean_data(self, data_name='aapr', phase='train', fold=0, clean=1, clear=0, *args, **kwargs):
+
+
+        input_path = '{}{}/{}_{}.input'.format(self.data_root, data_name, phase, fold)
+
+        mode = '_'.join(['clean'])
+        save_input_path = '{}{}/{}_{}_{}.input'.format(self.data_root, data_name, phase, fold, mode)
+        fw_input = open(save_input_path, 'w')
+
+        with open(input_path, 'r') as fp:
+            while True:
+                line = fp.readline().strip()
+                if not line:
+                    break
+                if clean:
+                    new_line = clean_line(line)
+                else:
+                    new_line = line
+                fw_input.write(new_line + '\n')
 
 
 if __name__ == '__main__':
@@ -188,8 +233,8 @@ if __name__ == '__main__':
         data_processor.extract_abs_label()
     elif args.phase == 'save_abs_label':
         data_processor.save_abs_label()
-    elif args.phase == 'split_data':
-        data_processor.split_data()
+    elif args.phase.split('+')[0] == 'split_data':
+        data_processor.split_data(clean=int(args.phase.split('+')[1]))
     else:
         print("What the F**K! There is no {} function.".format(args.phase))
     end_time = datetime.datetime.now()
