@@ -218,11 +218,7 @@ if __name__ == '__main__':
         config_name = args.phase.split('+')[1]
         config_path = './config/{}.json'.format(config_name)
         config = json.load(open(config_path, 'r'))
-        data_name = config['data_name']
-        fold = config['fold']
-        split_rate = config['split_rate']
-        clean = config['clean']
-        data_processor.split_data(data_name=data_name, fold=fold, split_rate=split_rate, clean=clean, **config)
+        data_processor.split_data(**config)
     else:
         print("What the F**K! There is no {} function.".format(args.phase))
     end_time = datetime.datetime.now()
