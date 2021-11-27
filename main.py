@@ -40,7 +40,7 @@ def main_ml(config):
 
         model.train(x_train, y_train)
         model_path = "{}{}/{}.{}.{}".format(data_loader.exp_root, data_name, model_name, feature, fold)
-        model.save(model_path)
+        model.save_model(model_path)
 
         model.evaluate(x_train, y_train, phase='train')
 
