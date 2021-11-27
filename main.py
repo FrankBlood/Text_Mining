@@ -82,7 +82,8 @@ if __name__ == '__main__':
     parser.add_argument('--phase', default='test', help='the function name.')
 
     args = parser.parse_args()
-    config_path = './config/{}.json'.format(args.phase)
+    data_name = args.phase.strip().split('.')[0]
+    config_path = './config/{}/{}.json'.format(data_name, args.phase)
     if not os.path.exists(config_path):
         raise RuntimeError("There is no {} config.".format(args.phase))
     config = json.load(open(config_path, 'r'))

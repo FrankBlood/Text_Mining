@@ -232,7 +232,8 @@ if __name__ == '__main__':
         data_processor.save_abs_label()
     elif args.phase.split('+')[0] == 'split_data':
         config_name = args.phase.split('+')[1]
-        config_path = './config/{}.json'.format(config_name)
+        data_name = config_name.strip().split('.')[0]
+        config_path = './config/{}/{}.json'.format(data_name, config_name)
         config = json.load(open(config_path, 'r'))
         data_processor.split_data(**config)
     else:
