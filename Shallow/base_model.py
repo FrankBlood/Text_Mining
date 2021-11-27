@@ -22,7 +22,7 @@ from joblib import dump, load
 class base_model(object):
     def __init__(self):
         print('Init...')
-        self.model_name = 'ml_base'
+        self.model_name = 'ml'
 
     def build(self):
         self.model = None
