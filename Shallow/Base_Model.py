@@ -61,7 +61,7 @@ class Base_Model(object):
         metric_score = '\t'.join(['{:.2f}'.format(name_score[1]) for name_score in sorted_cal_res])
         if phase == 'train':
             print("{}\t{}\t{}".format(self.model_name, phase, metric_names))
-        print("{}\t{}\t".format(self.model_name, phase, metric_score))
+        print("{}\t{}\t{}".format(self.model_name, phase, metric_score))
         return sorted_cal_res
 
 
