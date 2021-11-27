@@ -20,7 +20,7 @@ sys.path.insert(0, '.')
 sys.path.insert(0, '..')
 from Data_Processor import Data_Processor
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from gensim.corpora.dictionary import Dictionary
 from gensim.models import LdaModel
 from joblib import load, dump
@@ -51,7 +51,7 @@ class Data_Loader(Data_Processor):
             if feature == 'tf':
                 feature_extractor = CountVectorizer().fit(input_data)
             elif feature == 'tfidf':
-                feature_extractor = TfidfTransformer().fit(input_data)
+                feature_extractor = TfidfVectorizer().fit(input_data)
             elif feature == 'lda':
                 dictionary = Dictionary([text.strip().split() for text in input_data])
                 dictionary_save_path = save_path + '.dict'
