@@ -73,8 +73,10 @@ class Data_Loader(Data_Processor):
             dictionary = load(save_path+'.dict')
             corpus = [dictionary.doc2bow(text.strip().split()) for text in input_data]
             x = feature_extractor[corpus]
+            print(type(x))
         else:
             x = feature_extractor.transform(input_data)
+            print(type(x))
         y = output_data
 
         return x, y
