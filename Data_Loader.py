@@ -75,6 +75,7 @@ class Data_Loader(Data_Processor):
             # x = feature_extractor.get_document_topics(corpus)  # , minimum_probability=0
             x = feature_extractor[corpus]
             x = [[prob for (topic, prob) in line] for line in x]
+            print(type(x))
         else:
             x = feature_extractor.transform(input_data)
             print(type(x))
