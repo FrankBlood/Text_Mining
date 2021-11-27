@@ -21,6 +21,7 @@ import json
 import random
 import nltk
 
+
 class Data_Processor(object):
     def __init__(self):
         print('Init...')
@@ -132,6 +133,8 @@ class Data_Processor(object):
         self.save_pair(data_input=abs_list, data_output=label_list, input_path=input_path, output_path=output_path)
         print("There are {} 1 labels.".format(sum(list(map(int, label_list)))/len(label_list)))
 
+    ################################################################################
+
     def clean_line(self, line):
         new_line = nltk.word_tokenize(line.lower())
         return ' '.join(new_line)
@@ -157,8 +160,8 @@ class Data_Processor(object):
             train_output = data_output[:int(data_size*split_rate)]
             val_input = data_input[int(data_size*split_rate): int(data_size * (split_rate + (1-split_rate)/2))]
             val_output = data_output[int(data_size*split_rate): int(data_size * (split_rate + (1-split_rate)/2))]
-            test_input = data_input[int(data_size * (split_rate + (1-split_rate)/2)):]
-            test_output = data_output[int(data_size * (split_rate + (1-split_rate)/2)):]
+            test_input = data_input[int(data_size*(split_rate + (1-split_rate)/2)):]
+            test_output = data_output[int(data_size*(split_rate + (1-split_rate)/2)):]
 
             if clean:
                 mode = '_'.join(['clean'])
@@ -194,26 +197,6 @@ class Data_Processor(object):
                            input_path=test_input_path, output_path=test_output_path, clean=clean)
             print("There are {} 1 labels.".format(sum(list(map(int, test_output))) / len(test_output)))
 
-    def clean_data(self, data_name='aapr', phase='train', fold=0, clean=1, clear=0, *args, **kwargs):
-
-
-        input_path = '{}{}/{}_{}.input'.format(self.data_root, data_name, phase, fold)
-
-        mode = '_'.join(['clean'])
-        save_input_path = '{}{}/{}_{}_{}.input'.format(self.data_root, data_name, phase, fold, mode)
-        fw_input = open(save_input_path, 'w')
-
-        with open(input_path, 'r') as fp:
-            while True:
-                line = fp.readline().strip()
-                if not line:
-                    break
-                if clean:
-                    new_line = clean_line(line)
-                else:
-                    new_line = line
-                fw_input.write(new_line + '\n')
-
 
 if __name__ == '__main__':
     start_time = datetime.datetime.now()
@@ -233,7 +216,7 @@ if __name__ == '__main__':
         data_processor.save_abs_label()
     elif args.phase.split('+')[0] == 'split_data':
         config_name = args.phase.split('+')[1]
-        config_path = './config/{}'.format(config_name)
+        config_path = './config/{}.json'.format(config_name)
         config = json.load(open(config_path, 'r'))
         data_name = config['data_name']
         fold = config['fold']

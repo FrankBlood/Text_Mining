@@ -24,7 +24,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from gensim.corpora.dictionary import Dictionary
 from gensim.models import LdaModel
 from joblib import load, dump
-import nltk
+import re
+
 
 class Data_Loader(Data_Processor):
     def __init__(self):
