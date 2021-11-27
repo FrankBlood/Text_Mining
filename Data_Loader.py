@@ -21,7 +21,7 @@ sys.path.insert(0, '..')
 from Data_Processor import Data_Processor
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
-import joblib
+from joblib import load, dump
 
 class Data_Loader(Data_Processor):
     def __init__(self):
@@ -35,24 +35,28 @@ class Data_Loader(Data_Processor):
         with open(output_path, 'r') as fp:
             output_data = list(map(lambda x: int(x.strip()), fp.readlines()))
 
-        if feature == 'tf':
-            feature_extractor = CountVectorizer().fit(input_data)
-        elif feature == 'tfidf':
-            feature_extractor = TfidfTransformer().fit(input_data)
-        else:
-            raise RuntimeError("Please confirm which feature you need.")
-
         save_folder = self.exp_root + data_name
         if not os.path.exists(save_folder):
             os.mkdir(save_folder)
         save_path = save_folder + '/ml_feature.{}'.format(feature)
+
+        if phase == 'train':
+            if feature == 'tf':
+                feature_extractor = CountVectorizer().fit(input_data)
+            elif feature == 'tfidf':
+                feature_extractor = TfidfTransformer().fit(input_data)
+            else:
+                raise RuntimeError("Please confirm which feature you need.")
+        else:
+            feature_extractor = load(save_path)
+
         if not os.path.exists(self.exp_root + '{}/ml_feature.{}'.format(data_name, feature)):
-            joblib.dump(feature_extractor, save_path)
+            dump(feature_extractor, save_path)
 
-        X = feature_extractor.transform(input_data)
-        Y = output_data
+        x = feature_extractor.transform(input_data)
+        y = output_data
 
-        return X, Y
+        return x, y
 
 
 if __name__ == '__main__':

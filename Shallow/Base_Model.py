@@ -16,10 +16,11 @@ import os
 import sys
 import argparse
 import datetime
-
 from joblib import dump, load
+from utils.metrics import cal_all
 
-class base_model(object):
+
+class Base_Model(object):
     def __init__(self):
         print('Init...')
         self.model_name = 'ml'
@@ -27,32 +28,31 @@ class base_model(object):
     def build(self):
         self.model = None
 
-    def train(self, X, Y):
-        self.model.fit(X, Y)
+    def train(self, x, y):
+        self.model.fit(x, y)
         return self.model
 
     def save_model(self, path):
         dump(self.model, path)
+        print("Successfully save {} model to {}.".format(self.model_name, path))
 
     def load_model(self, path):
         model = load(path)
         return model
 
-    def test(self, X, path=None):
+    def test(self, x, path=None):
         if path:
             self.model = self.load_model(path)
-        Y = self.model.predict(X)
-        return Y
+        y = self.model.predict(x)
+        return y
 
-    def evaluate(self, X, Y, path=None, phase='train'):
+    def evaluate(self, x, y, path=None, phase='train'):
         if path:
             self.model = self.load_model(path)
-        Pred_Y = self.model.predict(X)
-        acc = accuracy_score(Y, Pred_Y)
-        precision = precision_score(Y, Pred_Y, average='micro')
-        recall = recall_score(Y, Pred_Y, average='micro')
-        print("{} {}: acc\tprecision\trecall".format(self.model_name, phase))
-        print("{} {}: {}\t{}\t{}".format(self.model_name, phase, acc, precision, recall))
+        pred_y = self.model.predict(x)
+        acc, precision, recall, f1_score = cal_all(y, pred_y)
+        print("{}\t{}\tacc\tprecision\trecall\tf1score".format(self.model_name, phase))
+        print("{}\t{}\t{}\t{}\t{}\t{}".format(self.model_name, phase, acc, precision, recall, f1_score))
 
 
 if __name__ == '__main__':

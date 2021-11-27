@@ -17,10 +17,32 @@ import sys
 import argparse
 import datetime
 from Data_Loader import Data_Loader
+from Shallow.SVM import SVM
 
-def main(data_name='aapr', model_name='svm'):
+model_dict = {
+    'svm': SVM
+}
+
+
+def main(data_name='aapr', model_name='svm', folds=10, feature='tf'):
     data_loader = Data_Loader()
+    for fold in range(folds):
 
+        x_train, y_train = data_loader.data_load(data_name=data_name, phase='train', fold=fold, feature=feature)
+        model = model_dict[model_name]()
+        model.build()
+
+        model.train(x_train, y_train)
+        model_path = "{}{}/{}.{}.{}".format(data_loader.exp_root, data_name, model_name, feature, fold)
+        model.save(model_path)
+
+        model.evaluate(x_train, y_train, phase='train')
+
+        x_val, y_val = data_loader.data_load(data_name=data_name, phase='val', fold=fold, feature=feature)
+        x_test, x_test = data_loader.data_load(data_name=data_name, phase='test', fold=fold, feature=feature)
+
+        model.evaluate(x_val, y_val, phase='val')
+        model.evaluate(x_test, x_test, phase='test')
 
 
 if __name__ == '__main__':
