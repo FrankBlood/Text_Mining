@@ -51,8 +51,9 @@ class Base_Model(object):
             self.model = self.load_model(path)
         pred_y = self.model.predict(x)
         acc, precision, recall, f1_score = cal_all(y, pred_y)
-        print("{}\t{}\tacc\tprecision\trecall\tf1score".format(self.model_name, phase))
-        print("{}\t{}\t{}\t{}\t{}\t{}".format(self.model_name, phase, acc, precision, recall, f1_score))
+        if phase == 'train':
+            print("{}\t{}\tacc\tprecision\trecall\tf1score".format(self.model_name, phase))
+        print("{}\t{}\t{}\t{}\t{}\t{:.4f}".format(self.model_name, phase, acc, precision, recall, f1_score))
 
 
 if __name__ == '__main__':

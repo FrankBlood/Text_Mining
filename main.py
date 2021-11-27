@@ -18,18 +18,24 @@ import argparse
 import datetime
 from Data_Loader import Data_Loader
 from Shallow.SVM import SVM
+import json
 
-model_dict = {
+ml_model_dict = {
     'svm': SVM
 }
 
 
-def main(data_name='aapr', model_name='svm', folds=10, feature='tf'):
+def main_ml(config):
+    data_name = config['data_name']  # 'aapr'
+    model_name = config['model_name']  # 'svm'
+    folds = config['folds']  # 10
+    feature = config['feature']  # 'tf'
+
     data_loader = Data_Loader()
     for fold in range(folds):
 
         x_train, y_train = data_loader.data_load(data_name=data_name, phase='train', fold=fold, feature=feature)
-        model = model_dict[model_name]()
+        model = ml_model_dict[model_name]()
         model.build()
 
         model.train(x_train, y_train)
@@ -54,6 +60,11 @@ if __name__ == '__main__':
 
     if args.phase == 'test':
         print('This is a test process.')
+    elif args.phase == 'aapr.svm.tf.json':
+        config = json.load(open('./config/{}.json'.format(args.phase), 'r'))
+        print("config: \n", config)
+        if config['model_name'] in ml_model_dict:
+            main_ml(config)
     else:
         print("What the F**K! There is no {} function.".format(args.phase))
     end_time = datetime.datetime.now()
