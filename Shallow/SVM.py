@@ -21,7 +21,7 @@ from sklearn.svm import LinearSVC
 
 
 class SVM(Base_Model):
-    def __init__(self):
+    def __init__(self, metrics_num):
         super(SVM, self).__init__()
         self.model_name = 'svm'
 
