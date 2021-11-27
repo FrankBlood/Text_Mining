@@ -22,16 +22,24 @@ from Data_Processor import Data_Processor
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 from joblib import load, dump
+import nltk
 
 class Data_Loader(Data_Processor):
     def __init__(self):
         super(Data_Loader, self).__init__()
 
-    def data_load(self, data_name='aapr', phase='train', fold=0, feature='tf', clear=0, *args, **kwargs):
+    def data_load(self, data_name='aapr', phase='train', fold=0, feature='tf', clean=1, clear=0, *args, **kwargs):
+        def clean_line(line):
+            new_line = nltk.word_tokenize(line.lower())
+            return ' '.join(new_line)
+
         input_path = '{}{}/{}_{}.input'.format(self.data_root, data_name, phase, fold)
         output_path = '{}{}/{}_{}.output'.format(self.data_root, data_name, phase, fold)
         with open(input_path, 'r') as fp:
-            input_data = list(map(lambda x: x.strip(), fp.readlines()))
+            if clean:
+                input_data = list(map(lambda x: clean_line(x.strip()), fp.readlines()))
+            else:
+                input_data = list(map(lambda x: x.strip(), fp.readlines()))
         with open(output_path, 'r') as fp:
             output_data = list(map(lambda x: int(x.strip()), fp.readlines()))
 
