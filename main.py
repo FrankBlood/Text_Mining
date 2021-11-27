@@ -55,7 +55,6 @@ def main_ml(config):
 
         model.evaluate(x_val, y_val, phase='val')
         sorted_cal_res = model.evaluate(x_test, y_test, phase='test')
-        print(sorted_cal_res)
         name_list = [name_score[0][1:] for name_score in sorted_cal_res]
         fold_score_list = [name_score[1] for name_score in sorted_cal_res]
         score_list.append(fold_score_list)
@@ -63,8 +62,8 @@ def main_ml(config):
     score_std = np.std(score_list, axis=0)
     mean_std_list = ['{:.2f}+_{:.2f}'.format(mean, std) for mean, std in zip(score_mean, score_std)]
     print('-' * 20)
-    print("\t".format(name_list))
-    print("\t".format(mean_std_list))
+    print("\t".join(name_list))
+    print("\t".join(mean_std_list))
 
 
 if __name__ == '__main__':
