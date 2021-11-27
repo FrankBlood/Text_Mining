@@ -20,6 +20,7 @@ import datetime
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
+from sklearn.metrics import log_loss
 
 
 def cal_acc(y_true, y_pred):
@@ -35,6 +36,11 @@ def cal_precision(y_true, y_pred):
 def cal_recall(y_true, y_pred):
     recall = recall_score(y_true, y_pred)
     return recall
+
+
+def cal_logloss(y_true, y_proba):
+    logloss = log_loss(y_true, y_proba)
+    return logloss
 
 
 def cal_all(y_true, y_pred):
