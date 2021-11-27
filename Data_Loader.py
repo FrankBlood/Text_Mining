@@ -21,6 +21,8 @@ sys.path.insert(0, '..')
 from Data_Processor import Data_Processor
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
+from gensim.corpora.dictionary import Dictionary
+from gensim.models import LdaModel
 from joblib import load, dump
 import nltk
 
@@ -29,17 +31,14 @@ class Data_Loader(Data_Processor):
         super(Data_Loader, self).__init__()
 
     def data_load(self, data_name='aapr', phase='train', fold=0, feature='tf', clean=1, clear=0, *args, **kwargs):
-        def clean_line(line):
-            new_line = nltk.word_tokenize(line.lower())
-            return ' '.join(new_line)
-
-        input_path = '{}{}/{}_{}.input'.format(self.data_root, data_name, phase, fold)
+        if clean:
+            mode = '_'.join(['clean'])
+            input_path = '{}{}/{}_{}_{}.input'.format(self.data_root, data_name, phase, mode, fold)
+        else:
+            input_path = '{}{}/{}_{}.input'.format(self.data_root, data_name, phase, fold)
         output_path = '{}{}/{}_{}.output'.format(self.data_root, data_name, phase, fold)
         with open(input_path, 'r') as fp:
-            if clean:
-                input_data = list(map(lambda x: clean_line(x.strip()), fp.readlines()))
-            else:
-                input_data = list(map(lambda x: x.strip(), fp.readlines()))
+            input_data = list(map(lambda x: x.strip(), fp.readlines()))
         with open(output_path, 'r') as fp:
             output_data = list(map(lambda x: int(x.strip()), fp.readlines()))
 
@@ -53,15 +52,28 @@ class Data_Loader(Data_Processor):
                 feature_extractor = CountVectorizer().fit(input_data)
             elif feature == 'tfidf':
                 feature_extractor = TfidfTransformer().fit(input_data)
+            elif feature == 'lda':
+                dictionary = Dictionary([text.strip().split() for text in input_data])
+                corpus = [dictionary.doc2bow(text.strip().split()) for text in input_data]
+                feature_extractor = LdaModel(corpus, num_topics=10)
+                dictionary_save_path = save_path + '.dict'
+                if not os.path.exists(dictionary_save_path) or clear:
+                    dump(dictionary, save_path)
+                    print("Successfully save dict to {}.".format(dictionary_save_path))
             else:
                 raise RuntimeError("Please confirm which feature you need.")
-            if not os.path.exists(self.exp_root + '{}/ml_feature.{}.{}'.format(data_name, feature, fold)) or clear:
+            if not os.path.exists(save_path) or clear:
                 dump(feature_extractor, save_path)
                 print("Successfully save features to {}.".format(save_path))
         else:
             feature_extractor = load(save_path)
 
-        x = feature_extractor.transform(input_data)
+        if feature == 'lda':
+            dictionary = load(save_path+'.dict')
+            corpus = [dictionary.doc2bow(text) for text in input_data]
+            x = feature_extractor[corpus]
+        else:
+            x = feature_extractor.transform(input_data)
         y = output_data
 
         return x, y
