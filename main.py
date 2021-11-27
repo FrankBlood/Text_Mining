@@ -60,7 +60,7 @@ if __name__ == '__main__':
 
     if args.phase == 'test':
         print('This is a test process.')
-    elif args.phase == 'aapr.svm.tf.json':
+    elif args.phase == 'aapr.svm.tf':
         config = json.load(open('./config/{}.json'.format(args.phase), 'r'))
         print("config: \n", config)
         if config['model_name'] in ml_model_dict:
