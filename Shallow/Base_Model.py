@@ -56,7 +56,6 @@ class Base_Model(object):
             metric = cal_all
         cal_res = metric(y, pred_y)
         sorted_cal_res = sorted(cal_res.items(), key=lambda x: x[0])
-        print(sorted_cal_res)
         metric_names = '\t'.join([name_score[0][1:] for name_score in sorted_cal_res])
         metric_score = '\t'.join(['{:.2f}'.format(name_score[1]) for name_score in sorted_cal_res])
         if phase == 'train':
