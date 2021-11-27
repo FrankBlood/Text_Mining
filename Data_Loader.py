@@ -24,6 +24,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from gensim.corpora.dictionary import Dictionary
 from gensim.models import LdaModel
 from joblib import load, dump
+import numpy as np
 
 
 class Data_Loader(Data_Processor):
@@ -76,7 +77,7 @@ class Data_Loader(Data_Processor):
             x = [feature_extractor.get_document_topics(dictionary.doc2bow(text.strip().split()))
                  for text in input_data]  # , minimum_probability=0
             x = [[prob for (topic, prob) in line] for line in x]
-            print(x)
+            print(np.shape(x))
             print(type(x))
         else:
             x = feature_extractor.transform(input_data)
