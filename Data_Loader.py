@@ -24,7 +24,6 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from gensim.corpora.dictionary import Dictionary
 from gensim.models import LdaModel
 from joblib import load, dump
-import re
 
 
 class Data_Loader(Data_Processor):
@@ -64,7 +63,6 @@ class Data_Loader(Data_Processor):
                 if 'num_topics' in kwargs:
                     num_topics = kwargs['num_topics']
                 feature_extractor = LdaModel(corpus, num_topics=num_topics)
-
             else:
                 raise RuntimeError("Please confirm which feature you need.")
             if not os.path.exists(save_path) or clear:
@@ -75,12 +73,11 @@ class Data_Loader(Data_Processor):
 
         if feature == 'lda':
             dictionary = load(save_path+'.dict')
-            x = [feature_extractor.get_document_topics(dictionary.doc2bow(text.strip().split()), minimum_probability=0)
-                 for text in input_data]
+            x = [feature_extractor.get_document_topics(dictionary.doc2bow(text.strip().split()))
+                 for text in input_data]  # , minimum_probability=0
             x = [[prob for (topic, prob) in line] for line in x]
         else:
             x = feature_extractor.transform(input_data)
-            print(type(x))
         y = output_data
 
         return x, y
