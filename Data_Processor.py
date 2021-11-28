@@ -197,21 +197,42 @@ class Data_Processor(object):
                            input_path=test_input_path, output_path=test_output_path, clean=clean)
             print("There are {} 1 labels.".format(sum(list(map(int, test_output))) / len(test_output)))
 
-    # def get_vocab(self, data_name='aapr', fold=10):
-    #     for i in range(fold):
-    #         train_input_path = self.data_root + '{}/train_{}.input'.format(data_name, i)
-    #         with open(train_input_path, 'r') as fp:
-    #
-    #
-    #         data_input = list(map(lambda x: x.strip(), fp.readlines()))
-    #         print("Successfully load input data from {}.".format(self.data_root + '{}/data.input'.format(data_name)))
-    #
-    #     with open(self.data_root + '{}/data.output'.format(data_name), 'r') as fp:
-    #         data_output = list(map(lambda x: x.strip(), fp.readlines()))
-    #         print("Successfully load output data from {}.".format(self.data_root + '{}/data.output'.format(data_name)))
+    def get_vocab(self, data_name='aapr', fold=10, clean=0, cover_rate=1, mincount=0, *args, **kwargs):
+        for i in range(fold):
+            if clean:
+                mode = '_'.join(['clean'])
+                train_input_path = self.data_root + '{}/train_{}_{}.input'.format(data_name, mode, i)
+            else:
+                train_input_path = self.data_root + '{}/train_{}.input'.format(data_name, i)
 
-
-
+            word_count_dict = {}
+            total_word_count = 0
+            with open(train_input_path, 'r') as fp:
+                for line in fp.readlines():
+                    for word in line.strip().split():
+                        total_word_count += 1
+                        if word not in word_count_dict:
+                            word_count_dict[word] = 1
+                        else:
+                            word_count_dict[word] += 1
+            sorted_word_count_dict = sorted(word_count_dict.items(), key=lambda x: x[1], reverse=True)
+            word_dict = {'PAD': 0, 'UNK': 1, 'SOS': 2, 'EOS': 3}
+            tmp_word_count = 0
+            for word, count in sorted_word_count_dict:
+                tmp_word_count += count
+                current_rate = tmp_word_count / total_word_count
+                if count > mincount and current_rate < cover_rate:
+                    word_dict[word] = len(word_dict)
+            exp_data_folder = self.exp_root + '{}/'.format(data_name)
+            if not os.path.exists(exp_data_folder):
+                os.mkdir(exp_data_folder)
+            exp_data_dl_folder = exp_data_folder + 'dl/'
+            if not os.path.exists(exp_data_dl_folder):
+                os.mkdir(exp_data_dl_folder)
+            word_dict_path = exp_data_dl_folder + 'vocab.cover{}.min{}.{}.json'.format(cover_rate, mincount, i)
+            with open(word_dict_path, 'w') as fw:
+                json.dump(word_dict, fw)
+            print("Successfully save word dict to {}.".format(word_dict_path))
 
 
 if __name__ == '__main__':
@@ -236,6 +257,8 @@ if __name__ == '__main__':
         config_path = './config/{}/{}.json'.format(data_name, config_name)
         config = json.load(open(config_path, 'r'))
         data_processor.split_data(**config)
+    elif args.phase == 'get_vocab':
+        data_processor.get_vocab()
     else:
         print("What the F**K! There is no {} function.".format(args.phase))
     end_time = datetime.datetime.now()
