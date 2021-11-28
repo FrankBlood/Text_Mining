@@ -27,7 +27,7 @@ from joblib import load, dump
 import numpy as np
 import json
 from keras.preprocessing.sequence import pad_sequences
-from keras.utils.np_utils import to_categorical
+# from keras.utils.np_utils import to_categorical
 
 
 class Data_Loader(Data_Processor):
@@ -101,7 +101,9 @@ class Data_Loader(Data_Processor):
             batch_output.append(output_data[i])
             count += 1
             if count == batch_size:
-                yield pad_sequences(batch_input), to_categorical(batch_output, num_classes=num_classes)
+                batch_x = pad_sequences(batch_input)
+                batch_y = np.array(batch_output)
+                yield batch_x, batch_y
                 batch_input, batch_output = [], []
                 count = 0
 

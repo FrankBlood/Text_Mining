@@ -39,9 +39,10 @@ class Base_Model(nn.Module):
 
         self.embedding = nn.Embedding(self.vocab_size, embed_dim)
         self.fc = nn.Linear(hidden_dim, num_classes)
-        self.softmax = nn.LogSoftmax(dim=1)
+        # self.softmax = nn.LogSoftmax(dim=1)
         self.criterion_dict = {
-            'NLLLoss': torch.nn.NLLLoss
+            'NLLLoss': torch.nn.NLLLoss,
+            'CrossEntropyLoss': torch.nn.CrossEntropyLoss
         }
         self.optimizer_dict = {
             'Adam': torch.optim.Adam
@@ -79,11 +80,11 @@ class Base_Model(nn.Module):
                 loss = self.criterion(batch_pred_y, batch_y)
                 loss.backward()
                 self.optimizer.step()
-                y_label = list(np.argmax(y, axis=-1))
+                y_label = list(y)
                 pred_y_label = list(np.argmax(batch_y.cpu(), axis=-1))
                 total_y += y_label
                 total_pred_label = pred_y_label
-            metric_score = cal_all(total_y, total_pred_label)
+            metric_score = cal_all(np.array(total_y), np.array(total_pred_label))
             sorted_metric_score = sorted(metric_score.items(), key=lambda x: x[0])
             metrics_string = '\t'.join([metric_name[1:] for metric_name, _ in sorted_metric_score])
             score_string = '\t'.join(['{:.2f}'.format(score) for _, score in sorted_metric_score])
