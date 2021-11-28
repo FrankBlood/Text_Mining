@@ -72,8 +72,7 @@ class Base_Model(nn.Module):
         model.train()
         for epoch in range(self.num_epochs):
             total_y, total_pred_label = [], []
-            for x, y in data_generator(input_path, output_path, word_dict, batch_size=self.batch_size,
-                                       num_classes=self.num_classes):
+            for x, y in data_generator(input_path, output_path, word_dict, batch_size=self.batch_size):
                 batch_x = torch.LongTensor(x).to(self.device)
                 batch_y = torch.LongTensor(y).to(self.device)
                 batch_pred_y = model(batch_x)
