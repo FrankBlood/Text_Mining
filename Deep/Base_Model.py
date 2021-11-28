@@ -63,7 +63,8 @@ class Base_Model(nn.Module):
     def forward(self, x):
         embed = self.embedding(x)  # [batch_size, seq_len, embeding]=[128, 32, 300]
         avg_embed = torch.mean(embed, dim=1)
-        out = self.softmax(self.fc(avg_embed))
+        # out = self.softmax(self.fc(avg_embed))
+        out = self.fc(avg_embed)
         return out
 
     def train_model(self, model, data_generator, input_path, output_path, word_dict):
