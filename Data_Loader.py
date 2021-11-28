@@ -96,7 +96,12 @@ class Data_Loader(Data_Processor):
             output_data = fp.readlines()
 
         for i in range(0, len(output_data), batch_size):
-            batch_input = [[int(word_dict[word]) for word in line.strip().split()] for line in input_data[i: i+batch_size]]
+            batch_input = []
+            for line in input_data[i: i+batch_size]:
+                new_line = []
+                for word in line.strip().split():
+                    new_line.append(int(word_dict[word]) if word in word_dict else int(word_dict['UNK']))
+                batch_input.append(new_line)
             batch_x = pad_sequences(batch_input)
             batch_output = [int(label.strip()) for label in output_data[i: i+batch_size]]
             batch_y = np.array(batch_output)
