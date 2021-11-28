@@ -86,26 +86,21 @@ class Data_Loader(Data_Processor):
 
         return x, y
 
-    def data_generator(self, input_path, output_path, word_dict=None,
-                       batch_size=64, num_classes=2):
+    def data_generator(self, input_path, output_path,
+                       word_dict=None, batch_size=64):
 
         with open(input_path, 'r') as fp:
             input_data = fp.readlines()
+
         with open(output_path, 'r') as fp:
-            output_data =fp.readlines()
-        batch_input, batch_output = [], []
-        count = 0
-        for i in range(len(output_data)):
-            new_line = [int(word_dict[word]) for word in input_data[i].strip().split()]
-            batch_input.append(new_line)
-            batch_output.append(int(output_data[i]))
-            count += 1
-            if count == batch_size:
-                batch_x = pad_sequences(batch_input)
-                batch_y = np.array(batch_output)
-                yield batch_x, batch_y
-                batch_input, batch_output = [], []
-                count = 0
+            output_data = fp.readlines()
+
+        for i in range(0, len(output_data), batch_size):
+            batch_input = [[int(word_dict[word]) for word in line.strip().split()] for line in input_data[i: i+batch_size]]
+            batch_x = pad_sequences(batch_input)
+            batch_output = [int(label.strip()) for label in output_data[i: i+batch_size]]
+            batch_y = np.array(batch_output)
+            yield batch_x, batch_y
 
 
 if __name__ == '__main__':
