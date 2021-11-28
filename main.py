@@ -23,8 +23,10 @@ from Shallow.Gaussian_Naive_Bayes import Gaussian_Naive_Bayes
 from Shallow.GBDT import GBDT
 from Shallow.Logistic_Regression import Logistic_Regression
 from Shallow.Random_Forest import Random_Forest
+from Deep.Base_Model import Base_Model
 import json
 import numpy as np
+import torch
 
 ml_model_dict = {
     'svm': SVM,
@@ -33,6 +35,10 @@ ml_model_dict = {
     'gbdt': GBDT,
     'lr': Logistic_Regression,
     'rf': Random_Forest,
+}
+
+dl_model_dict = {
+    'mlp': Base_Model
 }
 
 
@@ -75,6 +81,32 @@ def main_ml(config):
     print("\t".join(name_list))
     print("\t".join(mean_std_list))
 
+def main_dl(config):
+    data_name = config['data_name']
+
+    folds = config['folds']  # 10
+    clean = config['clean']  # 10
+    cover_rate = config['cover_rate']
+    min_count = config['min_count']
+
+    data_loader = Data_Loader()
+
+    for fold in range(folds):
+        print("This is the {} cross fold.".format(fold))
+        word_dict_path = "{}{}/dl/vocab/vocab.cover{}.min{}.{}.json"\
+            .format(data_loader.exp_root, data_name, cover_rate, min_count, fold)
+        with open(word_dict_path, 'r') as fp:
+            word_dict = json.load(fp)
+        if clean:
+            mode = '_'.join(['clean'])
+            input_path = '{}{}/{}/{}_{}_{}.input'.format(data_loader.data_root, data_name, fold, 'train', mode, fold)
+        else:
+            input_path = '{}{}/{}/{}_{}.input'.format(data_loader.data_root, data_name, fold, 'train', fold)
+        output_path = '{}{}/{}/{}_{}.output'.format(data_loader.data_root, data_name, fold, 'train', fold)
+        vocab_size = len(word_dict)
+        model = dl_model_dict[model_name](vocab_size=vocab_size, **config)
+        model.train_model(model, data_loader.data_generator, input_path, output_path, word_dict)
+
 
 if __name__ == '__main__':
     start_time = datetime.datetime.now()
@@ -83,7 +115,8 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     data_name = args.phase.strip().split('.')[0]
-    config_path = './config/{}/{}.json'.format(data_name, args.phase)
+    model_cate = args.phase.strip().split('.')[1]
+    config_path = './config/{}/{}/{}.json'.format(data_name, model_cate, args.phase)
     if not os.path.exists(config_path):
         raise RuntimeError("There is no {} config.".format(args.phase))
     config = json.load(open(config_path, 'r'))
@@ -92,6 +125,8 @@ if __name__ == '__main__':
     model_name = config['model_name']
     if model_name in ml_model_dict:
         main_ml(config)
+    elif model_name in dl_model_dict:
+        main_dl(config)
     else:
         raise RuntimeError("There is no model name.".format(model_name))
 

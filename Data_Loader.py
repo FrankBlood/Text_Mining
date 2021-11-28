@@ -25,6 +25,9 @@ from gensim.corpora.dictionary import Dictionary
 from gensim.models import LdaModel
 from joblib import load, dump
 import numpy as np
+import json
+from keras.preprocessing.sequence import pad_sequences
+from keras.utils.np_utils import to_categorical
 
 
 class Data_Loader(Data_Processor):
@@ -82,6 +85,25 @@ class Data_Loader(Data_Processor):
         y = output_data
 
         return x, y
+
+    def data_generator(self, input_path, output_path, word_dict=None,
+                       batch_size=64, num_classes=2):
+
+        with open(input_path, 'r') as fp:
+            input_data = fp.readlines()
+        with open(output_path, 'r') as fp:
+            output_data =fp.readlines()
+        batch_input, batch_output = [], []
+        count = 0
+        for i in range(len(output_data)):
+            new_line = [int(word_dict[word]) for word in input_data[i].strip().split()]
+            batch_input.append(new_line)
+            batch_output.append(output_data[i])
+            count += 1
+            if count == batch_size:
+                yield pad_sequences(batch_input), to_categorical(batch_output, num_classes=num_classes)
+                batch_input, batch_output = [], []
+                count = 0
 
 
 if __name__ == '__main__':
