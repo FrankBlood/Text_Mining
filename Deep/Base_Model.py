@@ -81,9 +81,9 @@ class Base_Model(nn.Module):
                 loss.backward()
                 self.optimizer.step()
                 y_label = list(y)
-                pred_y_label = list(np.argmax(batch_y.cpu(), axis=-1))
                 total_y += y_label
-                total_pred_label = pred_y_label
+                pred_y_label = list(np.argmax(batch_pred_y.cpu(), axis=-1))
+                total_pred_label += pred_y_label
             metric_score = cal_all(np.array(total_y), np.array(total_pred_label))
             sorted_metric_score = sorted(metric_score.items(), key=lambda x: x[0])
             metrics_string = '\t'.join([metric_name[1:] for metric_name, _ in sorted_metric_score])
