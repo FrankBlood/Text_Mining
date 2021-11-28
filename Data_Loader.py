@@ -98,7 +98,7 @@ class Data_Loader(Data_Processor):
         for i in range(len(output_data)):
             new_line = [int(word_dict[word]) for word in input_data[i].strip().split()]
             batch_input.append(new_line)
-            batch_output.append(output_data[i])
+            batch_output.append(int(output_data[i]))
             count += 1
             if count == batch_size:
                 batch_x = pad_sequences(batch_input)
