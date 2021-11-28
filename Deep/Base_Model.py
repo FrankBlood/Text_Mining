@@ -24,7 +24,7 @@ from utils.metrics import cal_all
 class Base_Model(nn.Module):
     def __init__(self, vocab_size, embed_dim, hidden_dim, num_classes,
                  dropout, learning_rate, num_epochs, batch_size,
-                 criterion_name, optimizer_name, gpu):
+                 criterion_name, optimizer_name, gpu, **kwargs):
         super(Base_Model, self).__init__()
         self.vocab_size = vocab_size
         self.embed_dim = embed_dim
