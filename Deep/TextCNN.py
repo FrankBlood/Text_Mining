@@ -40,7 +40,6 @@ class TextCNN(Base_Model):
         if 'metrics_num' in kwargs:
             self.metrics_num = kwargs['metrics_num']
 
-        self.embedding = nn.Embedding(self.vocab_size, embed_dim)
         self.convs = nn.ModuleList(
             [nn.Conv2d(1, num_filters, (k, self.embed_dim)) for k in self.filter_sizes])
         self.dropout = nn.Dropout(self.dropout_rate)
