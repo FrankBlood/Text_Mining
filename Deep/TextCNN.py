@@ -34,7 +34,7 @@ class TextCNN(Base_Model):
                  criterion_name, optimizer_name, gpu, **kwargs)
 
         self.num_filters = num_filters
-        self.filter_size = filter_sizes
+        self.filter_sizes = filter_sizes
 
         self.metrics_num = 4
         if 'metrics_num' in kwargs:
@@ -42,7 +42,7 @@ class TextCNN(Base_Model):
 
         self.embedding = nn.Embedding(self.vocab_size, embed_dim)
         self.convs = nn.ModuleList(
-            [nn.Conv2d(1, num_filters, (k, self.embed_dim)) for k in filter_sizes])
+            [nn.Conv2d(1, num_filters, (k, self.embed_dim)) for k in self.filter_sizes])
         self.dropout = nn.Dropout(self.dropout_rate)
         self.fc1 = nn.Linear(self.num_filters * len(self.filter_sizes), self.hidden_dim)
 
