@@ -2,7 +2,7 @@
 # -*- coding:utf8 -*-
 
 """
-Text_CNN
+TextCNN
 ======
 A class for something.
 @author: Guoxiu He
@@ -24,13 +24,13 @@ from utils.metrics import cal_all
 from Deep.Base_Model import Base_Model
 
 
-class Text_CNN(Base_Model):
+class TextCNN(Base_Model):
     def __init__(self, vocab_size, embed_dim, hidden_dim, num_classes,
                  num_filters, filter_sizes,
-                 dropout, learning_rate, num_epochs, batch_size,
+                 dropout_rate, learning_rate, num_epochs, batch_size,
                  criterion_name, optimizer_name, gpu, **kwargs):
-        super(Text_CNN, self).__init__(vocab_size, embed_dim, hidden_dim, num_classes,
-                 dropout, learning_rate, num_epochs, batch_size,
+        super(TextCNN, self).__init__(vocab_size, embed_dim, hidden_dim, num_classes,
+                 dropout_rate, learning_rate, num_epochs, batch_size,
                  criterion_name, optimizer_name, gpu, **kwargs)
 
         self.num_filters = num_filters
