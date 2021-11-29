@@ -1,5 +1,5 @@
 # Text Mining
-This project aims to construct a comprehensive framework for text mining, including text classification, text matching, text generation, via machine learning and deep learning.
+This project aims to construct a comprehensive machine learning and deep learning framework for text mining, including text classification, text matching, text generation.
 
 ## Run
 To run deep leanring models:
