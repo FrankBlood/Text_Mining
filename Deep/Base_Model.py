@@ -60,6 +60,7 @@ class Base_Model(nn.Module):
         self.gpu = gpu
 
         self.device = torch.device('cuda:{}'.format(self.gpu) if torch.cuda.is_available() else 'cpu')
+        print("Device: {}.".format(self.device))
 
     def forward(self, x):
         embed = self.embedding(x)  # [batch_size, seq_len, embeding]=[128, 32, 300]
