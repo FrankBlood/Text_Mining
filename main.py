@@ -27,6 +27,7 @@ from Deep.Base_Model import Base_Model
 import json
 import numpy as np
 import torch
+from torchsummary import summary
 
 ml_model_dict = {
     'svm': SVM,
@@ -89,6 +90,7 @@ def main_dl(config):
     clean = config['clean']  # 10
     cover_rate = config['cover_rate']
     min_count = config['min_count']
+    input_shape = tuple(config['input_shape'])
 
     data_loader = Data_Loader()
 
@@ -119,6 +121,7 @@ def main_dl(config):
             os.mkdir(save_fold_folder)
         vocab_size = len(word_dict)
         model = dl_model_dict[model_name](vocab_size=vocab_size, **config)
+        summary(model, input_shape)
         model.train_model(model, data_loader.data_generator, input_path, output_path, word_dict,
                           input_path_val=input_path_val, output_path_val=output_path_val,
                           input_path_test=input_path_test, output_path_test=output_path_test,

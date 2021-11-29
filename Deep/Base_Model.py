@@ -23,14 +23,14 @@ from utils.metrics import cal_all
 
 class Base_Model(nn.Module):
     def __init__(self, vocab_size, embed_dim, hidden_dim, num_classes,
-                 dropout, learning_rate, num_epochs, batch_size,
+                 dropout_rate, learning_rate, num_epochs, batch_size,
                  criterion_name, optimizer_name, gpu, **kwargs):
         super(Base_Model, self).__init__()
         self.vocab_size = vocab_size
         self.embed_dim = embed_dim
         self.hidden_dim = hidden_dim
         self.num_classes = num_classes
-        self.dropout = dropout
+        self.dropout_rate = dropout_rate
         self.learning_rate = learning_rate
         self.num_epochs = num_epochs
         self.batch_size = batch_size
@@ -43,7 +43,7 @@ class Base_Model(nn.Module):
 
         self.embedding = nn.Embedding(self.vocab_size, embed_dim)
         self.fc1 = nn.Linear(embed_dim, hidden_dim)
-        self.fc2 = nn.Linear(hidden_dim, num_classes)
+        self.fc_out = nn.Linear(hidden_dim, num_classes)
         # self.softmax = nn.LogSoftmax(dim=1)
         self.criterion_dict = {
             'NLLLoss': torch.nn.NLLLoss,
@@ -71,7 +71,7 @@ class Base_Model(nn.Module):
         avg_embed = torch.mean(embed, dim=1)
         # out = self.softmax(self.fc(avg_embed))
         hidden = self.fc1(avg_embed)
-        out = self.fc2(hidden)
+        out = self.fc_out(hidden)
         return out
 
     def train_model(self, model, data_generator, input_path, output_path, word_dict,
