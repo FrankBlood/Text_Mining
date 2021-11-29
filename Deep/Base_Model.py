@@ -128,7 +128,7 @@ class Base_Model(nn.Module):
                 self.eval_model(model, data_generator, input_path_test, output_path_test, word_dict, 'test', epoch)
 
         if input_path_test and output_path_test:
-            model = torch.load('{}.{}.ckpt'.format(save_folder, 'best'))
+            model = torch.load('{}{}.ckpt'.format(save_folder, 'best'))
             model.eval()
             self.eval_model(model, data_generator, input_path_test, output_path_test, word_dict, 'test', 'final')
 
