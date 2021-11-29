@@ -164,7 +164,7 @@ class Data_Processor(object):
             test_output = data_output[int(data_size*(split_rate+(1-split_rate)/2)):]
 
             data_folder = self.data_root + '{}/'.format(data_name)
-            data_fold_folder = data_folder + '{}/'.format(fold)
+            data_fold_folder = data_folder + '{}/'.format(i)
             if not os.path.exists(data_fold_folder):
                 os.mkdir(data_fold_folder)
 
