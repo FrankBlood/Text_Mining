@@ -123,7 +123,8 @@ def main_dl(config):
             os.mkdir(save_fold_folder)
         vocab_size = len(word_dict)
         model = dl_model_dict[model_name](vocab_size=vocab_size, **config)
-        summary(model, input_shape)
+        # summary(model, input_shape)
+        print(model)
         model.train_model(model, data_loader.data_generator, input_path, output_path, word_dict,
                           input_path_val=input_path_val, output_path_val=output_path_val,
                           input_path_test=input_path_test, output_path_test=output_path_test,
