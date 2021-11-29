@@ -120,8 +120,8 @@ class Data_Processor(object):
         print("Done for saving {} lines to {}.".format(count, path))
 
     def save_pair(self, data_input, data_output, input_path, output_path, clean=0):
-        self.save_single(data_input, input_path)
-        self.save_single(data_output, output_path)
+        self.save_single(data_input, input_path, clean=clean)
+        self.save_single(data_output, output_path, clean=clean)
 
     def save_abs_label(self):
         save_path = self.data_root + 'aapr/'
@@ -158,18 +158,23 @@ class Data_Processor(object):
             data_size = len(data_output)
             train_input = data_input[:int(data_size*split_rate)]
             train_output = data_output[:int(data_size*split_rate)]
-            val_input = data_input[int(data_size*split_rate): int(data_size * (split_rate + (1-split_rate)/2))]
-            val_output = data_output[int(data_size*split_rate): int(data_size * (split_rate + (1-split_rate)/2))]
-            test_input = data_input[int(data_size*(split_rate + (1-split_rate)/2)):]
-            test_output = data_output[int(data_size*(split_rate + (1-split_rate)/2)):]
+            val_input = data_input[int(data_size*split_rate): int(data_size*(split_rate+(1-split_rate)/2))]
+            val_output = data_output[int(data_size*split_rate): int(data_size*(split_rate+(1-split_rate)/2))]
+            test_input = data_input[int(data_size*(split_rate+(1-split_rate)/2)):]
+            test_output = data_output[int(data_size*(split_rate+(1-split_rate)/2)):]
+
+            data_folder = self.data_root + '{}/'.format(data_name)
+            data_fold_folder = data_folder + '{}/'.format(fold)
+            if not os.path.exists(data_fold_folder):
+                os.mkdir(data_fold_folder)
 
             if clean:
                 mode = '_'.join(['clean'])
-                train_input_path = self.data_root + '{}/train_{}_{}.input'.format(data_name, mode, i)
-                train_output_path = self.data_root + '{}/train_{}_{}.output'.format(data_name, mode, i)
+                train_input_path = data_fold_folder + 'train_{}_{}.input'.format(mode, i)
+                train_output_path = data_fold_folder + 'train_{}_{}.output'.format(mode, i)
             else:
-                train_input_path = self.data_root + '{}/train_{}.input'.format(data_name, i)
-                train_output_path = self.data_root + '{}/train_{}.output'.format(data_name, i)
+                train_input_path = data_fold_folder + 'train_{}.input'.format(i)
+                train_output_path = data_fold_folder + 'train_{}.output'.format(i)
             self.save_pair(data_input=train_input, data_output=train_output,
                            input_path=train_input_path, output_path=train_output_path,
                            clean=clean)
@@ -177,33 +182,39 @@ class Data_Processor(object):
 
             if clean:
                 mode = '_'.join(['clean'])
-                val_input_path = self.data_root + '{}/val_{}_{}.input'.format(data_name, mode, i)
-                val_output_path = self.data_root + '{}/val_{}_{}.output'.format(data_name, mode, i)
+                val_input_path = data_fold_folder + 'val_{}_{}.input'.format(mode, i)
+                val_output_path = data_fold_folder + 'val_{}_{}.output'.format(mode, i)
             else:
-                val_input_path = self.data_root + '{}/val_{}.input'.format(data_name, i)
-                val_output_path = self.data_root + '{}/val_{}.output'.format(data_name, i)
+                val_input_path = data_fold_folder + 'val_{}.input'.format(i)
+                val_output_path = data_fold_folder + 'val_{}.output'.format(i)
             self.save_pair(data_input=val_input, data_output=val_output,
                            input_path=val_input_path, output_path=val_output_path, clean=clean)
             print("There are {} 1 labels.".format(sum(list(map(int, val_output))) / len(val_output)))
 
             if clean:
                 mode = '_'.join(['clean'])
-                test_input_path = self.data_root + '{}/test_{}_{}.input'.format(data_name, mode, i)
-                test_output_path = self.data_root + '{}/test_{}_{}.output'.format(data_name, mode, i)
+                test_input_path = data_fold_folder + '/test_{}_{}.input'.format(mode, i)
+                test_output_path = data_fold_folder + '/test_{}_{}.output'.format(mode, i)
             else:
-                test_input_path = self.data_root + '{}/test_{}.input'.format(data_name, i)
-                test_output_path = self.data_root + '{}/test_{}.output'.format(data_name, i)
+                test_input_path = data_fold_folder + '/test_{}.input'.format(i)
+                test_output_path = data_fold_folder + '/test_{}.output'.format(i)
             self.save_pair(data_input=test_input, data_output=test_output,
                            input_path=test_input_path, output_path=test_output_path, clean=clean)
             print("There are {} 1 labels.".format(sum(list(map(int, test_output))) / len(test_output)))
 
     def get_vocab(self, data_name='aapr', fold=10, clean=0, cover_rate=1, mincount=0, *args, **kwargs):
+        data_folder = self.data_root + '{}/'.format(data_name)
+        if not os.path.exists(data_folder):
+            os.mkdir(data_folder)
+        data_fold_folder = data_folder + '{}/'.format(fold)
+        if not os.path.exists(data_fold_folder):
+            os.mkdir(data_fold_folder)
         for i in range(fold):
             if clean:
                 mode = '_'.join(['clean'])
-                train_input_path = self.data_root + '{}/train_{}_{}.input'.format(data_name, mode, i)
+                train_input_path = data_fold_folder + 'train_{}_{}.input'.format(mode, i)
             else:
-                train_input_path = self.data_root + '{}/train_{}.input'.format(data_name, i)
+                train_input_path = data_fold_folder + 'train_{}.input'.format(i)
 
             word_count_dict = {}
             total_word_count = 0
@@ -254,7 +265,8 @@ if __name__ == '__main__':
     elif args.phase.split('+')[0] == 'split_data':
         config_name = args.phase.split('+')[1]
         data_name = config_name.strip().split('.')[0]
-        config_path = './config/{}/{}.json'.format(data_name, config_name)
+        model_cate = config_name.strip().split('.')[1]
+        config_path = './config/{}/{}/{}.json'.format(data_name, model_cate, config_name)
         config = json.load(open(config_path, 'r'))
         data_processor.split_data(**config)
     elif args.phase == 'get_vocab':
