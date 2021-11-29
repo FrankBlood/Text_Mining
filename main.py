@@ -97,6 +97,7 @@ def main_dl(config):
             .format(data_loader.exp_root, data_name, cover_rate, min_count, fold)
         with open(word_dict_path, 'r') as fp:
             word_dict = json.load(fp)
+            print("Load word dict from {}.".format(word_dict_path))
         if clean:
             mode = '_'.join(['clean'])
             input_path = '{}{}/{}/{}_{}_{}.input'.format(data_loader.data_root, data_name, fold, 'train', mode, fold)
@@ -120,7 +121,7 @@ if __name__ == '__main__':
     if not os.path.exists(config_path):
         raise RuntimeError("There is no {} config.".format(args.phase))
     config = json.load(open(config_path, 'r'))
-    print(config)
+    print('config: ', config)
 
     model_name = config['model_name']
     if model_name in ml_model_dict:

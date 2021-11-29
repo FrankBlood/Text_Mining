@@ -34,11 +34,12 @@ class Base_Model(nn.Module):
         self.learning_rate = learning_rate
         self.num_epochs = num_epochs
         self.batch_size = batch_size
-        self.optimizer_name = optimizer_name
         self.criterion_name = criterion_name
+        self.optimizer_name = optimizer_name
 
         self.embedding = nn.Embedding(self.vocab_size, embed_dim)
-        self.fc = nn.Linear(hidden_dim, num_classes)
+        self.fc1 = nn.Linear(embed_dim, hidden_dim)
+        self.fc2 = nn.Linear(hidden_dim, num_classes)
         # self.softmax = nn.LogSoftmax(dim=1)
         self.criterion_dict = {
             'NLLLoss': torch.nn.NLLLoss,
@@ -64,7 +65,8 @@ class Base_Model(nn.Module):
         embed = self.embedding(x)  # [batch_size, seq_len, embeding]=[128, 32, 300]
         avg_embed = torch.mean(embed, dim=1)
         # out = self.softmax(self.fc(avg_embed))
-        out = self.fc(avg_embed)
+        hidden = self.fc1(avg_embed)
+        out = self.fc2(hidden)
         return out
 
     def train_model(self, model, data_generator, input_path, output_path, word_dict):
@@ -72,6 +74,7 @@ class Base_Model(nn.Module):
         model.train()
         for epoch in range(self.num_epochs):
             total_y, total_pred_label = [], []
+            total_loss = 0
             for x, y in data_generator(input_path, output_path, word_dict, batch_size=self.batch_size):
                 batch_x = torch.LongTensor(x).to(self.device)
                 batch_y = torch.LongTensor(y).to(self.device)
@@ -84,10 +87,11 @@ class Base_Model(nn.Module):
                 total_y += y_label
                 pred_y_label = list(np.argmax(batch_pred_y.cpu().detach().numpy(), axis=-1))
                 total_pred_label += pred_y_label
+                total_loss = loss.item()
             metric_score = cal_all(np.array(total_y), np.array(total_pred_label))
             sorted_metric_score = sorted(metric_score.items(), key=lambda x: x[0])
-            metrics_string = '\t'.join([metric_name[1:] for metric_name, _ in sorted_metric_score])
-            score_string = '\t'.join(['{:.2f}'.format(score) for _, score in sorted_metric_score])
+            metrics_string = '\t'.join(['loss'] + [metric_name[1:] for metric_name, _ in sorted_metric_score])
+            score_string = '\t'.join(['{:.2f}'.format(total_loss)] + ['{:.2f}'.format(score) for _, score in sorted_metric_score])
             print("{}\t{}\t{}".format('train', epoch, metrics_string))
             print("{}\t{}\t{}".format('train', epoch, score_string))
 
