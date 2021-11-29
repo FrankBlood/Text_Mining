@@ -133,8 +133,5 @@ dmypy.json
 /Datasets/*
 run*
 /logs/*
-<<<<<<< HEAD
 /exp/*
-=======
 *.sh
->>>>>>> a51a5ab9f67c1d980442f6d6c4a76a3085185a75
