@@ -204,12 +204,9 @@ class Data_Processor(object):
 
     def get_vocab(self, data_name='aapr', fold=10, clean=0, cover_rate=1, mincount=0, *args, **kwargs):
         data_folder = self.data_root + '{}/'.format(data_name)
-        if not os.path.exists(data_folder):
-            os.mkdir(data_folder)
-        data_fold_folder = data_folder + '{}/'.format(fold)
-        if not os.path.exists(data_fold_folder):
-            os.mkdir(data_fold_folder)
+
         for i in range(fold):
+            data_fold_folder = data_folder + '{}/'.format(i)
             if clean:
                 mode = '_'.join(['clean'])
                 train_input_path = data_fold_folder + 'train_{}_{}.input'.format(mode, i)
@@ -227,6 +224,7 @@ class Data_Processor(object):
                         else:
                             word_count_dict[word] += 1
             sorted_word_count_dict = sorted(word_count_dict.items(), key=lambda x: x[1], reverse=True)
+            print("There are {} words originally.".format(len(sorted_word_count_dict)))
             word_dict = {'PAD': 0, 'UNK': 1, 'SOS': 2, 'EOS': 3}
             tmp_word_count = 0
             for word, count in sorted_word_count_dict:
@@ -234,13 +232,17 @@ class Data_Processor(object):
                 current_rate = tmp_word_count / total_word_count
                 if count > mincount and current_rate < cover_rate:
                     word_dict[word] = len(word_dict)
+            print("There are {} words finally.".format(len(word_dict)))
             exp_data_folder = self.exp_root + '{}/'.format(data_name)
             if not os.path.exists(exp_data_folder):
                 os.mkdir(exp_data_folder)
             exp_data_dl_folder = exp_data_folder + 'dl/'
             if not os.path.exists(exp_data_dl_folder):
                 os.mkdir(exp_data_dl_folder)
-            word_dict_path = exp_data_dl_folder + 'vocab.cover{}.min{}.{}.json'.format(cover_rate, mincount, i)
+            vocal_data_dl_folder = exp_data_dl_folder + 'vocab/'
+            if not os.path.exists(vocal_data_dl_folder):
+                os.mkdir(vocal_data_dl_folder)
+            word_dict_path = vocal_data_dl_folder + 'vocab.cover{}.min{}.{}.json'.format(cover_rate, mincount, i)
             with open(word_dict_path, 'w') as fw:
                 json.dump(word_dict, fw)
             print("Successfully save word dict to {}.".format(word_dict_path))
@@ -269,8 +271,13 @@ if __name__ == '__main__':
         config_path = './config/{}/{}/{}.json'.format(data_name, model_cate, config_name)
         config = json.load(open(config_path, 'r'))
         data_processor.split_data(**config)
-    elif args.phase == 'get_vocab':
-        data_processor.get_vocab()
+    elif args.phase.split('+')[0] == 'get_vocab':
+        config_name = args.phase.split('+')[1]
+        data_name = config_name.strip().split('.')[0]
+        model_cate = config_name.strip().split('.')[1]
+        config_path = './config/{}/{}/{}.json'.format(data_name, model_cate, config_name)
+        config = json.load(open(config_path, 'r'))
+        data_processor.get_vocab(**config)
     else:
         print("What the F**K! There is no {} function.".format(args.phase))
     end_time = datetime.datetime.now()
