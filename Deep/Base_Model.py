@@ -37,6 +37,10 @@ class Base_Model(nn.Module):
         self.criterion_name = criterion_name
         self.optimizer_name = optimizer_name
 
+        self.metrics_num = 4
+        if 'metrics_num' in kwargs:
+            self.metrics_num = kwargs['metrics_num']
+
         self.embedding = nn.Embedding(self.vocab_size, embed_dim)
         self.fc1 = nn.Linear(embed_dim, hidden_dim)
         self.fc2 = nn.Linear(hidden_dim, num_classes)
@@ -89,7 +93,10 @@ class Base_Model(nn.Module):
                 pred_y_label = list(np.argmax(batch_pred_y.cpu().detach().numpy(), axis=-1))
                 total_pred_label += pred_y_label
                 total_loss = loss.item()
-            metric_score = cal_all(np.array(total_y), np.array(total_pred_label))
+            metric = cal_all
+            if self.metrics_num == 4:
+                metric = cal_all
+            metric_score = metric(np.array(total_y), np.array(total_pred_label))
             sorted_metric_score = sorted(metric_score.items(), key=lambda x: x[0])
             metrics_string = '\t'.join(['loss'] + [metric_name[1:] for metric_name, _ in sorted_metric_score])
             score_string = '\t'.join(['{:.2f}'.format(total_loss)] + ['{:.2f}'.format(score) for _, score in sorted_metric_score])

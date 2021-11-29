@@ -89,6 +89,8 @@ class Data_Loader(Data_Processor):
     def data_generator(self, input_path, output_path,
                        word_dict=None, batch_size=64):
 
+        print("Load input data from {}.".format(input_path))
+        print("Load output data from {}.".format(output_path))
         with open(input_path, 'r') as fp:
             input_data = fp.readlines()
 
