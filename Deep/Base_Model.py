@@ -117,10 +117,12 @@ class Base_Model(nn.Module):
                 metric_score = \
                     self.eval_model(model, data_generator, input_path_val, output_path_val, word_dict, 'val', epoch)
                 acc = metric_score['1acc']
-                torch.save(model, '{}.{}.ckpt'.format(save_folder, epoch))
+                torch.save(model, '{}{}.ckpt'.format(save_folder, epoch))
+                print("Save model to {}.".format('{}{}.ckpt'.format(save_folder, epoch)))
                 if acc > best_score:
                     best_score = acc
-                    torch.save(model, '{}.{}.ckpt'.format(save_folder, 'best'))
+                    torch.save(model, '{}{}.ckpt'.format(save_folder, 'best'))
+                    print("Save model to {}.".format('{}{}.ckpt'.format(save_folder, 'best')))
 
             if input_path_test and output_path_test:
                 self.eval_model(model, data_generator, input_path_test, output_path_test, word_dict, 'test', epoch)

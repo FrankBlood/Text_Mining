@@ -113,12 +113,15 @@ def main_dl(config):
         save_folder = '{}{}/dl/{}/'.format(data_loader.exp_root, data_name, model_name)
         if not os.path.exists(save_folder):
             os.mkdir(save_folder)
+        save_fold_folder = '{}{}/dl/{}/{}/'.format(data_loader.exp_root, data_name, model_name, fold)
+        if not os.path.exists(save_fold_folder):
+            os.mkdir(save_fold_folder)
         vocab_size = len(word_dict)
         model = dl_model_dict[model_name](vocab_size=vocab_size, **config)
         model.train_model(model, data_loader.data_generator, input_path, output_path, word_dict,
                           input_path_val=input_path_val, output_path_val=output_path_val,
                           input_path_test=input_path_test, output_path_test=output_path_test,
-                          save_folder=save_folder)
+                          save_folder=save_fold_folder)
 
 
 if __name__ == '__main__':
