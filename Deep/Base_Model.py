@@ -74,12 +74,18 @@ class Base_Model(nn.Module):
         out = self.fc2(hidden)
         return out
 
-    def train_model(self, model, data_generator, input_path, output_path, word_dict):
+    def train_model(self, model, data_generator, input_path, output_path, word_dict,
+                    input_path_val=None, output_path_val=None,
+                    input_path_test=None, output_path_test=None,
+                    save_folder=None):
         model.to(self.device)
         model.train()
+        best_score = 0
         for epoch in range(self.num_epochs):
             total_y, total_pred_label = [], []
             total_loss = 0
+            step_num = 0
+            sample_num = 0
             for x, y in data_generator(input_path, output_path, word_dict, batch_size=self.batch_size):
                 batch_x = torch.LongTensor(x).to(self.device)
                 batch_y = torch.LongTensor(y).to(self.device)
@@ -88,20 +94,72 @@ class Base_Model(nn.Module):
                 loss = self.criterion(batch_pred_y, batch_y)
                 loss.backward()
                 self.optimizer.step()
-                y_label = list(y)
-                total_y += y_label
                 pred_y_label = list(np.argmax(batch_pred_y.cpu().detach().numpy(), axis=-1))
+
+                total_y += list(y)
                 total_pred_label += pred_y_label
-                total_loss = loss.item()
+
+                total_loss += loss.item() * len(y)
+                step_num += 1
+                sample_num += len(y)
+            print("Have trained {} steps.".format(step_num))
             metric = cal_all
             if self.metrics_num == 4:
                 metric = cal_all
             metric_score = metric(np.array(total_y), np.array(total_pred_label))
             sorted_metric_score = sorted(metric_score.items(), key=lambda x: x[0])
             metrics_string = '\t'.join(['loss'] + [metric_name[1:] for metric_name, _ in sorted_metric_score])
-            score_string = '\t'.join(['{:.2f}'.format(total_loss)] + ['{:.2f}'.format(score) for _, score in sorted_metric_score])
+            score_string = '\t'.join(['{:.2f}'.format(total_loss/sample_num)] + ['{:.2f}'.format(score) for _, score in sorted_metric_score])
             print("{}\t{}\t{}".format('train', epoch, metrics_string))
             print("{}\t{}\t{}".format('train', epoch, score_string))
+
+            if input_path_val and output_path_val:
+                metric_score = \
+                    self.eval_model(model, data_generator, input_path_val, output_path_val, word_dict, 'val', epoch)
+                acc = metric_score['1acc']
+                torch.save(model, '{}.{}.ckpt'.format(save_folder, epoch))
+                if acc > best_score:
+                    best_score = acc
+                    torch.save(model, '{}.{}.ckpt'.format(save_folder, 'best'))
+
+            if input_path_test and output_path_test:
+                self.eval_model(model, data_generator, input_path_test, output_path_test, word_dict, 'test', epoch)
+
+        if input_path_test and output_path_test:
+            model = torch.load('{}.{}.ckpt'.format(save_folder, 'best'))
+            model.eval()
+            self.eval_model(model, data_generator, input_path_test, output_path_test, word_dict, 'test', 'final')
+
+    def eval_model(self, model, data_generator, input_path, output_path, word_dict, phase, epoch):
+        model.to(self.device)
+        total_y, total_pred_label = [], []
+        total_loss = 0
+        step_num = 0
+        sample_num = 0
+        for x, y in data_generator(input_path, output_path, word_dict, batch_size=self.batch_size):
+            batch_x = torch.LongTensor(x).to(self.device)
+            batch_y = torch.LongTensor(y).to(self.device)
+            batch_pred_y = model(batch_x)
+            loss = self.criterion(batch_pred_y, batch_y)
+            pred_y_label = list(np.argmax(batch_pred_y.cpu().detach().numpy(), axis=-1))
+            total_y += list(y)
+            total_pred_label += pred_y_label
+
+            total_loss += loss.item() * len(y)
+            step_num += 1
+            sample_num += len(y)
+        print("Have {} {} steps.".format(phase, step_num))
+        metric = cal_all
+        if self.metrics_num == 4:
+            metric = cal_all
+        metric_score = metric(np.array(total_y), np.array(total_pred_label))
+        sorted_metric_score = sorted(metric_score.items(), key=lambda x: x[0])
+        metrics_string = '\t'.join(['loss'] + [metric_name[1:] for metric_name, _ in sorted_metric_score])
+        score_string = '\t'.join(
+            ['{:.2f}'.format(total_loss / sample_num)] + ['{:.2f}'.format(score) for _, score in sorted_metric_score])
+        print("{}\t{}\t{}".format(phase, epoch, metrics_string))
+        print("{}\t{}\t{}".format(phase, epoch, score_string))
+        return metric_score
 
 
 if __name__ == '__main__':

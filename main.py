@@ -101,12 +101,24 @@ def main_dl(config):
         if clean:
             mode = '_'.join(['clean'])
             input_path = '{}{}/{}/{}_{}_{}.input'.format(data_loader.data_root, data_name, fold, 'train', mode, fold)
+            input_path_val = '{}{}/{}/{}_{}_{}.input'.format(data_loader.data_root, data_name, fold, 'val', mode, fold)
+            input_path_test = '{}{}/{}/{}_{}_{}.input'.format(data_loader.data_root, data_name, fold, 'test', mode, fold)
         else:
             input_path = '{}{}/{}/{}_{}.input'.format(data_loader.data_root, data_name, fold, 'train', fold)
+            input_path_val = '{}{}/{}/{}_{}.input'.format(data_loader.data_root, data_name, fold, 'val', fold)
+            input_path_test = '{}{}/{}/{}_{}.input'.format(data_loader.data_root, data_name, fold, 'test', fold)
         output_path = '{}{}/{}/{}_{}.output'.format(data_loader.data_root, data_name, fold, 'train', fold)
+        output_path_val = '{}{}/{}/{}_{}.output'.format(data_loader.data_root, data_name, fold, 'val', fold)
+        output_path_test = '{}{}/{}/{}_{}.output'.format(data_loader.data_root, data_name, fold, 'test', fold)
+        save_folder = '{}{}/dl/{}/'.format(data_loader.exp_root, data_name, model_name)
+        if not os.path.exists(save_folder):
+            os.mkdir(save_folder)
         vocab_size = len(word_dict)
         model = dl_model_dict[model_name](vocab_size=vocab_size, **config)
-        model.train_model(model, data_loader.data_generator, input_path, output_path, word_dict)
+        model.train_model(model, data_loader.data_generator, input_path, output_path, word_dict,
+                          input_path_val=input_path_val, output_path_val=output_path_val,
+                          input_path_test=input_path_test, output_path_test=output_path_test,
+                          save_folder=save_folder)
 
 
 if __name__ == '__main__':

@@ -13,6 +13,7 @@ A class for something.
 """
 
 import os
+import random
 import sys
 import argparse
 import datetime
@@ -87,7 +88,7 @@ class Data_Loader(Data_Processor):
         return x, y
 
     def data_generator(self, input_path, output_path,
-                       word_dict=None, batch_size=64):
+                       word_dict=None, batch_size=64, shuffle=True):
 
         print("Load input data from {}.".format(input_path))
         print("Load output data from {}.".format(output_path))
@@ -96,6 +97,11 @@ class Data_Loader(Data_Processor):
 
         with open(output_path, 'r') as fp:
             output_data = fp.readlines()
+
+        if shuffle:
+            data = list(zip(input_data, output_data))
+            random.shuffle(data)
+            input_data, output_data = zip(*data)
 
         for i in range(0, len(output_data), batch_size):
             batch_input = []
