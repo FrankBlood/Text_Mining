@@ -24,6 +24,7 @@ from Shallow.GBDT import GBDT
 from Shallow.Logistic_Regression import Logistic_Regression
 from Shallow.Random_Forest import Random_Forest
 from Deep.Base_Model import Base_Model
+from Deep.TextCNN import TextCNN
 import json
 import numpy as np
 import torch
@@ -39,7 +40,8 @@ ml_model_dict = {
 }
 
 dl_model_dict = {
-    'mlp': Base_Model
+    'mlp': Base_Model,
+    'textcnn': TextCNN
 }
 
 
