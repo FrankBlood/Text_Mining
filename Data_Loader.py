@@ -38,10 +38,10 @@ class Data_Loader(Data_Processor):
     def data_load(self, data_name='aapr', phase='train', fold=0, feature='tf', clean=0, clear=0, *args, **kwargs):
         if clean:
             mode = '_'.join(['clean'])
-            input_path = '{}{}/{}_{}_{}.input'.format(self.data_root, data_name, phase, mode, fold)
+            input_path = '{}{}/{}/{}_{}_{}.input'.format(self.data_root, data_name, fold, phase, mode, fold)
         else:
-            input_path = '{}{}/{}_{}.input'.format(self.data_root, data_name, phase, fold)
-        output_path = '{}{}/{}_{}.output'.format(self.data_root, data_name, phase, fold)
+            input_path = '{}{}/{}/{}_{}.input'.format(self.data_root, data_name, fold, phase, fold)
+        output_path = '{}{}/{}/{}_{}.output'.format(self.data_root, data_name, fold, phase, fold)
         with open(input_path, 'r') as fp:
             input_data = list(map(lambda x: x.strip(), fp.readlines()))
         with open(output_path, 'r') as fp:
@@ -50,7 +50,9 @@ class Data_Loader(Data_Processor):
         save_folder = self.exp_root + data_name
         if not os.path.exists(save_folder):
             os.mkdir(save_folder)
-        save_path = save_folder + '/ml_feature.{}.{}'.format(feature, fold)
+        if not os.path.exists(save_folder + '/ml_feature/'):
+            os.mkdir(save_folder + '/ml_feature/')
+        save_path = save_folder + '/ml_feature/{}.{}'.format(feature, fold)
 
         if phase == 'train' and (not os.path.exists(save_path) or clear):
             if feature == 'tf':

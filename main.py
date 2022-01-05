@@ -64,6 +64,9 @@ def main_ml(config):
         model.build()
 
         model.train(x_train, y_train)
+        save_folder = '{}{}/'.format(data_loader.exp_root, data_name)
+        if not os.path.exists(save_folder):
+            os.mkdir(save_folder)
         model_path = "{}{}/{}.{}.{}".format(data_loader.exp_root, data_name, model_name, feature, fold)
         model.save_model(model_path)
 
