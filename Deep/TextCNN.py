@@ -5,11 +5,6 @@
 TextCNN
 ======
 A class for something.
-@author: Guoxiu He
-@contact: gxhe@fem.ecnu.edu.cn
-@site: https://scholar.google.com/citations?user=2NVhxpAAAAAJ
-@time: 14:16, 2021/11/28
-@copyright: "Copyright (c) 2021 Guoxiu He. All Rights Reserved"
 """
 
 import os
@@ -51,12 +46,13 @@ class TextCNN(Base_Model):
         return x
 
     def forward(self, x):
-        embed = self.embedding(x)  # [batch_size, seq_len, embeding]=[128, 32, 300]
-        embed = embed.unsqueeze(1)
+        embed = self.embedding(x)  # [batch_size, seq_len, embedding]=[128, 32, 300]
+        embed = embed.unsqueeze(1)  # [batch_size, 1, seq_len, embedding]=[128, 1, 32, 300]
         cnn_out = torch.cat([self.conv_and_pool(embed, conv) for conv in self.convs], 1)
         cnn_out = self.dropout(cnn_out)
         hidden = self.fc1(cnn_out)
-        out = self.fc_out(hidden)
+        out = self.fc_out(hidden) # [batch_size, num_classes]
+        # [batch_size, seq_len, vocab_size]
         return out
 
 
@@ -70,7 +66,7 @@ if __name__ == '__main__':
     if args.phase == 'test':
         print('This is a test process.')
     else:
-        print("What the F**K! There is no {} function.".format(args.phase))
+        print("There is no {} function. Please check your command.".format(args.phase))
     end_time = datetime.datetime.now()
     print('{} takes {} seconds.'.format(args.phase, (end_time - start_time).seconds))
 

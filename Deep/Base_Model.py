@@ -5,11 +5,6 @@
 Base_Model
 ======
 A class for something.
-@author: Guoxiu He
-@contact: gxhe@fem.ecnu.edu.cn
-@site: https://scholar.google.com/citations?user=2NVhxpAAAAAJ
-@time: 14:16, 2021/11/28
-@copyright: "Copyright (c) 2021 Guoxiu He. All Rights Reserved"
 """
 
 import os
@@ -44,6 +39,7 @@ class Base_Model(nn.Module):
         self.embedding = nn.Embedding(self.vocab_size, embed_dim)
         self.fc1 = nn.Linear(embed_dim, hidden_dim)
         self.fc_out = nn.Linear(hidden_dim, num_classes)
+        self.dropout = nn.Dropout(dropout_rate)
         # self.softmax = nn.LogSoftmax(dim=1)
         self.criterion_dict = {
             'NLLLoss': torch.nn.NLLLoss,
@@ -71,6 +67,7 @@ class Base_Model(nn.Module):
         avg_embed = torch.mean(embed, dim=1)
         # out = self.softmax(self.fc(avg_embed))
         hidden = self.fc1(avg_embed)
+        hidden = self.dropout(hidden)
         out = self.fc_out(hidden)
         return out
 
@@ -134,6 +131,7 @@ class Base_Model(nn.Module):
 
     def eval_model(self, model, data_generator, input_path, output_path, word_dict, phase, epoch):
         model.to(self.device)
+        model.eval()
         total_y, total_pred_label = [], []
         total_loss = 0
         step_num = 0
@@ -174,7 +172,7 @@ if __name__ == '__main__':
     if args.phase == 'test':
         print('This is a test process.')
     else:
-        print("What the F**K! There is no {} function.".format(args.phase))
+        print("There is no {} function. Please check your command.".format(args.phase))
     end_time = datetime.datetime.now()
     print('{} takes {} seconds.'.format(args.phase, (end_time - start_time).seconds))
 

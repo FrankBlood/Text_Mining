@@ -5,11 +5,6 @@
 main
 ======
 A class for something.
-@author: Guoxiu He
-@contact: gxhe@fem.ecnu.edu.cn
-@site: https://scholar.google.com/citations?user=2NVhxpAAAAAJ
-@time: 18:11, 2021/11/26
-@copyright: "Copyright (c) 2021 Guoxiu He. All Rights Reserved"
 """
 
 import os

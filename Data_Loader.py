@@ -5,11 +5,6 @@
 Data_Loader
 ======
 A class for something.
-@author: Guoxiu He
-@contact: gxhe@fem.ecnu.edu.cn
-@site: https://scholar.google.com/citations?user=2NVhxpAAAAAJ
-@time: 18:48, 2021/11/25
-@copyright: "Copyright (c) 2021 Guoxiu He. All Rights Reserved"
 """
 
 import os
@@ -128,7 +123,7 @@ if __name__ == '__main__':
     if args.phase == 'test':
         print('This is a test process.')
     else:
-        print("What the F**K! There is no {} function.".format(args.phase))
+        print("There is no {} function. Please check your command.".format(args.phase))
     end_time = datetime.datetime.now()
     print('{} takes {} seconds.'.format(args.phase, (end_time - start_time).seconds))
 
